@@ -1,0 +1,56 @@
+name: "Issue Template"
+description: "새로운 이슈를 생성할 때 사용합니다."
+title: "[Type] 제목을 입력하세요"
+labels: ["bug", "enhancement"]
+assignees: []
+
+body:
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: "이슈 유형"
+      options:
+        - "🐛 버그 (Bug)"
+        - "✨ 기능 추가 (Feature)"
+        - "🛠️ 개선 (Refactor/Enhancement)"
+        - "📝 문서 업데이트 (Docs)"
+        - "🔧 설정 변경 (Configuration)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "설명"
+      description: "이슈에 대한 상세 설명을 작성하세요."
+      placeholder: "무슨 문제가 발생했나요? 또는 어떤 기능을 추가하려고 하나요?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps_to_reproduce
+    attributes:
+      label: "재현 방법 (Bug Report 경우 필수)"
+      description: "버그를 재현할 수 있는 단계를 작성해주세요."
+      placeholder: |
+        1. 어떤 환경에서 실행했나요?
+        2. 어떤 동작을 수행했나요?
+        3. 예상한 결과와 실제 결과는 무엇인가요?
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: "기대하는 동작"
+      description: "어떤 동작을 기대하셨나요?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: "추가 정보"
+      description: "스크린샷, 로그, 참고할 링크 등을 제공해주세요."
+    validations:
+      required: false
