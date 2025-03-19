@@ -4,6 +4,7 @@ import com.fightclub.fight_club_server.common.exception.UnauthorizedException
 import com.fightclub.fight_club_server.user.domain.User
 import com.fightclub.fight_club_server.user.dto.SignupRequest
 import com.fightclub.fight_club_server.user.dto.UserInfoResponse
+import com.fightclub.fight_club_server.user.dto.toUser
 import com.fightclub.fight_club_server.user.dto.toUserInfoResponse
 import com.fightclub.fight_club_server.user.exception.UserAlreadyExistsException
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
@@ -45,12 +46,9 @@ class UserService(
         }
 
         val encodedPassword = bCryptPasswordEncoder.encode(signupRequest.password)
+        val user = signupRequest.toUser(encodedPassword)
 
-        userRepository.save(User(
-            email = signupRequest.email,
-            password = encodedPassword,
-            nickname = signupRequest.nickname,
-            username = signupRequest.username
-        ))
+        userRepository.save(user)
     }
+
 }

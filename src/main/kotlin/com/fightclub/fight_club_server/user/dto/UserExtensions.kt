@@ -10,3 +10,10 @@ fun User.toUserInfoResponse() = UserInfoResponse(
     provider = this.provider,
     role = this.role
 )
+
+fun SignupRequest.toUser(encodedPassword: String) = User(
+    email = this.email,
+    password = encodedPassword,
+    nickname = this.nickname,
+    username = this.username
+)
