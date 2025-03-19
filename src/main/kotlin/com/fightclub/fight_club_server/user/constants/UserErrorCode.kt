@@ -10,4 +10,5 @@ enum class UserErrorCode(
     override val message: String
 ) : ResponseCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "UE001", "유저가 존재하지 않습니다."),
+    USER_ALREADY_EXIST(HttpStatus.CONFLICT, "UE002", "이미 가입된 사용자입니다.")
 }

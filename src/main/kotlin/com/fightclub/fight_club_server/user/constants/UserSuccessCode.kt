@@ -10,5 +10,6 @@ enum class UserSuccessCode(
     override val message: String
 ) : ResponseCode {
     MY_INFO_SUCCESS(HttpStatus.OK, "US001", "내 정보 조회 성공"),
-    USER_INFO_SUCCESS(HttpStatus.OK, "US002", "회원 정보 조회 성공")
+    USER_INFO_SUCCESS(HttpStatus.OK, "US002", "회원 정보 조회 성공"),
+    SIGNUP_SUCCESS(HttpStatus.OK, "US003", "회원가입 성공")
 }
