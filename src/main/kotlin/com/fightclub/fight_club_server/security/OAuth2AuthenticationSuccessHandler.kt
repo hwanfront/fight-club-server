@@ -7,6 +7,7 @@ import com.fightclub.fight_club_server.user.domain.AuthProvider
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
 import org.springframework.security.oauth2.core.user.OAuth2User
@@ -18,7 +19,9 @@ import java.io.IOException
 class OAuth2AuthenticationSuccessHandler(
     private val userRepository: UserRepository,
     private val tokenProvider: TokenProvider,
-    private val refreshTokenRepository: RefreshTokenRepository
+    private val refreshTokenRepository: RefreshTokenRepository,
+    @Value("\${app.oauth2.redirect-uri}") // yml 에서 값 주입
+    private val redirectUri: String
 ) : AuthenticationSuccessHandler {
 
     @Throws(IOException::class)
@@ -56,7 +59,7 @@ class OAuth2AuthenticationSuccessHandler(
                 tokenValue = refreshToken
             ))
         }
-        response.sendRedirect("http://localhost:5173?accessToken=$accessToken&refreshToken=$refreshToken")
+        response.sendRedirect("$redirectUri?accessToken=$accessToken&refreshToken=$refreshToken")
     }
 
     private fun getRegistrationIdFromAuth(authentication: Authentication): String {
