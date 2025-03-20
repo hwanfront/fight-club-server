@@ -2,12 +2,11 @@ package com.fightclub.fight_club_server.user.service
 
 import com.fightclub.fight_club_server.common.exception.UnauthorizedException
 import com.fightclub.fight_club_server.user.domain.User
-import com.fightclub.fight_club_server.user.dto.SignupRequest
-import com.fightclub.fight_club_server.user.dto.UserInfoResponse
-import com.fightclub.fight_club_server.user.dto.toUser
-import com.fightclub.fight_club_server.user.dto.toUserInfoResponse
+import com.fightclub.fight_club_server.user.domain.UserStatus
+import com.fightclub.fight_club_server.user.dto.*
 import com.fightclub.fight_club_server.user.exception.UserAlreadyExistsException
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
+import com.fightclub.fight_club_server.user.exception.UserNotWaitingStatusException
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -51,4 +50,23 @@ class UserService(
         userRepository.save(user)
     }
 
+    fun oAuth2Signup(oAuth2SignupRequest: OAuth2SignupRequest) {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication == null || !authentication.isAuthenticated) {
+            throw UnauthorizedException()
+        }
+
+        val user = authentication.principal as? User ?: throw UserNotFoundException()
+
+        if (user.status != UserStatus.WAITING) {
+            throw UserNotWaitingStatusException()
+        }
+
+        user.updateProfile(
+            nickname = oAuth2SignupRequest.nickname,
+            username = oAuth2SignupRequest.username,
+        )
+
+        userRepository.save(user)
+    }
 }

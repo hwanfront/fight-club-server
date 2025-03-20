@@ -4,7 +4,6 @@ import jakarta.persistence.*
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 @Entity
 @Table(name = "users")
@@ -14,7 +13,7 @@ class User(
 
     // 일반 로그인용
     @Column(unique = true)
-    var email: String? = null,
+    val email: String? = null,
     // e: file:///Users/kjh/IdeaProjects/fight-club-server/src/main/kotlin/com/fightclub/fight_club_server/user/domain/User.kt:22:5 Platform declaration clash: The following declarations have the same JVM signature (getPassword()Ljava/lang/String;):
     //    fun `<get-password>`(): String? defined in com.fightclub.fight_club_server.user.domain.User
     //    fun getPassword(): String? defined in com.fightclub.fight_club_server.user.domain.User
@@ -26,24 +25,26 @@ class User(
     var password: String? = null,
 
     @get:JvmName("getUserUsername")
-    val username: String? = null,
+    var username: String? = null,
 
-    val nickname: String? = null,
+    var nickname: String? = null,
 
     val providerId: String? = null,
     @Enumerated(EnumType.STRING)
-    var provider: AuthProvider = AuthProvider.NONE,
+    val provider: AuthProvider = AuthProvider.NONE,
 
     @Enumerated(EnumType.STRING)
-    val status: UserStatus = UserStatus.WAITING,
+    var status: UserStatus = UserStatus.WAITING,
 
     @Enumerated(EnumType.STRING)
     var role: UserRole = UserRole.ROLE_USER
 ): UserDetails {
-    fun encodePassword(encoder: BCryptPasswordEncoder) {
-        if (!this.password.isNullOrBlank()) {
-            this.password = encoder.encode(this.password)
-        }
+    fun updateProfile(nickname: String, username: String) {
+        require(nickname.length in 2..20) { "닉네임은 2자 이상 20자 이하여야 합니다." }
+        require(username.length in 2..50) { "사용자명은 2자 이상 50자 이하여야 합니다." }
+        this.nickname = nickname
+        this.username = username
+        this.status = UserStatus.REGISTERED
     }
 
     override fun getAuthorities(): Collection<GrantedAuthority> {

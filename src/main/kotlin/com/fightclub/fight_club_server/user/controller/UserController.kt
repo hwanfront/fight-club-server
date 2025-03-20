@@ -1,7 +1,8 @@
 package com.fightclub.fight_club_server.user.controller
 
-import com.fightclub.fight_club_server.auth.constants.UserSuccessCode
+import com.fightclub.fight_club_server.user.constants.UserSuccessCode
 import com.fightclub.fight_club_server.common.dto.ApiResponse
+import com.fightclub.fight_club_server.user.dto.OAuth2SignupRequest
 import com.fightclub.fight_club_server.user.dto.SignupRequest
 import com.fightclub.fight_club_server.user.service.UserService
 import jakarta.validation.Valid
@@ -18,4 +19,7 @@ class UserController(private val userService: UserService) {
 
     @PostMapping("/signup")
     fun signup(@Valid @RequestBody signupRequest: SignupRequest) = ApiResponse.success(UserSuccessCode.SIGNUP_SUCCESS, userService.signup(signupRequest))
+
+    @PatchMapping("/complete")
+    fun oAuth2Signup(@Valid @RequestBody oAuth2SignupRequest: OAuth2SignupRequest) = ApiResponse.success(UserSuccessCode.SIGNUP_SUCCESS, userService.oAuth2Signup(oAuth2SignupRequest))
 }

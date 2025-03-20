@@ -1,4 +1,4 @@
-package com.fightclub.fight_club_server.auth.constants
+package com.fightclub.fight_club_server.user.constants
 
 import com.fightclub.fight_club_server.common.constants.ResponseCode
 
