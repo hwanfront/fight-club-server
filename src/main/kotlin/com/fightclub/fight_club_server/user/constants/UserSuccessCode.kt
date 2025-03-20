@@ -11,5 +11,6 @@ enum class UserSuccessCode(
 ) : ResponseCode {
     MY_INFO_SUCCESS(HttpStatus.OK, "US001", "내 정보 조회 성공"),
     USER_INFO_SUCCESS(HttpStatus.OK, "US002", "회원 정보 조회 성공"),
-    SIGNUP_SUCCESS(HttpStatus.OK, "US003", "회원가입 성공")
+    SIGNUP_SUCCESS(HttpStatus.OK, "US003", "회원가입 성공"),
+    DELETE_SUCCESS(HttpStatus.OK, "US004", "회웥탈퇴 성공")
 }

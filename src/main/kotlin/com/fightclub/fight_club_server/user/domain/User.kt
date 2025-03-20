@@ -47,6 +47,10 @@ class User(
         this.status = UserStatus.REGISTERED
     }
 
+    fun deleteUser() {
+        this.status = UserStatus.DELETED
+    }
+
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return listOf(SimpleGrantedAuthority(role.name))
     }

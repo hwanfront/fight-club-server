@@ -22,4 +22,7 @@ class UserController(private val userService: UserService) {
 
     @PatchMapping("/complete")
     fun oAuth2Signup(@Valid @RequestBody oAuth2SignupRequest: OAuth2SignupRequest) = ApiResponse.success(UserSuccessCode.SIGNUP_SUCCESS, userService.oAuth2Signup(oAuth2SignupRequest))
+
+    @DeleteMapping("/delete")
+    fun deleteUser() = ApiResponse.success(UserSuccessCode.DELETE_SUCCESS, userService.deleteUser())
 }
