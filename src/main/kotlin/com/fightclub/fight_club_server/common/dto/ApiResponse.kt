@@ -22,6 +22,10 @@ data class ApiResponse<T>(
             return responseEntity(responseCode, null)
         }
 
+        fun error(responseCode: ResponseCode, errors: Map<String, String>): ResponseEntity<ApiResponse<Map<String, String>>> {
+            return responseEntity(responseCode, errors)
+        }
+
         private fun <T> responseEntity(responseCode: ResponseCode, data: T?): ResponseEntity<ApiResponse<T>> {
             return ResponseEntity.status(responseCode.status).body(
                 ApiResponse(
