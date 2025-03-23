@@ -1,10 +1,9 @@
 package com.fightclub.fight_club_server.auth.service
 
-import com.fightclub.fight_club_server.auth.dto.LoginRequest
-import com.fightclub.fight_club_server.auth.dto.LoginResponse
-import com.fightclub.fight_club_server.auth.dto.LogoutRequest
+import com.fightclub.fight_club_server.auth.dto.*
 import com.fightclub.fight_club_server.auth.exception.InvalidPasswordException
 import com.fightclub.fight_club_server.auth.exception.InvalidRefreshTokenException
+import com.fightclub.fight_club_server.auth.exception.RefreshTokenNotFoundException
 import com.fightclub.fight_club_server.common.exception.UnauthorizedException
 import com.fightclub.fight_club_server.jwt.TokenProvider
 import com.fightclub.fight_club_server.jwt.domain.RefreshToken
@@ -67,12 +66,40 @@ class AuthService(
         val user = authentication.principal as? User ?: throw UserNotFoundException()
         val userId = user.id!!
         val refreshToken = refreshTokenRepository.findByUserId(userId)
-            ?: throw InvalidRefreshTokenException()
+            ?: throw RefreshTokenNotFoundException()
 
         if(refreshToken.tokenValue != logoutRequest.refreshToken) {
             throw InvalidRefreshTokenException()
         }
 
         refreshTokenRepository.delete(refreshToken)
+    }
+
+    fun refreshToken(@RequestBody refreshRequest: RefreshRequest): RefreshResponse {
+        val refreshToken = refreshRequest.refreshToken
+            ?: throw InvalidRefreshTokenException()
+
+        if(!tokenProvider.validateToken(refreshToken)) {
+            throw InvalidRefreshTokenException()
+        }
+
+        val userId = tokenProvider.getUserIdFromToken(refreshToken)
+        val storedRefreshToken = refreshTokenRepository.findByUserId(userId)
+            ?: throw RefreshTokenNotFoundException()
+
+        if (storedRefreshToken.tokenValue != refreshToken) {
+            throw InvalidRefreshTokenException()
+        }
+
+        val newAccessToken = tokenProvider.generateAccessToken(userId)
+        val newRefreshToken = tokenProvider.generateRefreshToken(userId)
+
+        storedRefreshToken.tokenValue = newRefreshToken
+        refreshTokenRepository.save(storedRefreshToken)
+
+        return RefreshResponse(
+            accessToken = newAccessToken,
+            refreshToken = newRefreshToken
+        )
     }
 }

@@ -3,6 +3,7 @@ package com.fightclub.fight_club_server.auth.controller
 import com.fightclub.fight_club_server.auth.constants.AuthSuccessCode
 import com.fightclub.fight_club_server.auth.dto.LoginRequest
 import com.fightclub.fight_club_server.auth.dto.LogoutRequest
+import com.fightclub.fight_club_server.auth.dto.RefreshRequest
 import com.fightclub.fight_club_server.auth.service.AuthService
 import com.fightclub.fight_club_server.common.dto.ApiResponse
 import org.springframework.web.bind.annotation.PostMapping
@@ -18,4 +19,7 @@ class AuthController(private val authService: AuthService) {
 
     @PostMapping("/logout")
     fun logout(@RequestBody logoutRequest: LogoutRequest) = ApiResponse.success(AuthSuccessCode.LOGOUT_SUCCESS, authService.logout(logoutRequest))
+
+    @PostMapping("/refresh")
+    fun refresh(@RequestBody refreshRequest: RefreshRequest) = ApiResponse.success(AuthSuccessCode.TOKEN_REFRESH_SUCCESS, authService.refreshToken(refreshRequest))
 }
