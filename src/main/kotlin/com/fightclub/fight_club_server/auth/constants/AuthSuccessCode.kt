@@ -10,4 +10,5 @@ enum class AuthSuccessCode(
     override val message: String
 ) : ResponseCode {
     LOGIN_SUCCESS(HttpStatus.OK, "AS001", "로그인 성공"),
+    LOGOUT_SUCCESS(HttpStatus.OK, "AS002", "로그아웃 성공")
 }
