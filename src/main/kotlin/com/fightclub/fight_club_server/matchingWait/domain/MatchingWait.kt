@@ -14,6 +14,7 @@ class MatchingWait (
 
     var weight: Double = 0.0,
 
+    @Enumerated(EnumType.STRING)
     var weightClass: WeightClass,
 
     var createdAt: LocalDateTime = LocalDateTime.now()
