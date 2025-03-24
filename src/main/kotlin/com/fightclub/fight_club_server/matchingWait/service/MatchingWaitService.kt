@@ -61,4 +61,17 @@ class MatchingWaitService(
             createdAt = matchingWait.createdAt,
         )
     }
+
+    fun cancelMatchingWait() {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication == null || !authentication.isAuthenticated) {
+            throw UnauthorizedException()
+        }
+
+        val user = authentication.principal as? User ?: throw UserNotFoundException()
+        val matchingWait = matchingWaitRepository.findByUserId(user.id!!)
+            ?: throw MatchingWaitNotFoundException()
+
+        matchingWaitRepository.delete(matchingWait)
+    }
 }

@@ -10,4 +10,5 @@ enum class MatchingWaitSuccessCode(
 ): ResponseCode {
     GET_MY_WAIT_SUCCESS(HttpStatus.OK,"MWS001", "내 매칭 대기 정보를 불러왔습니다."),
     CREATE_WAIT_SUCCESS(HttpStatus.OK,"MWS002", "매칭 대기를 등록했습니다."),
+    REMOVE_WAIT_SUCCESS(HttpStatus.OK,"MWS003", "매칭 대기를 삭제했습니다.")
 }

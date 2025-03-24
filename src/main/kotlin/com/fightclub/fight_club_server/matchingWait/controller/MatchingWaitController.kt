@@ -17,4 +17,7 @@ class MatchingWaitController(
 
     @PostMapping
     fun createMatchingWait(@Valid @RequestBody request: MatchingWaitRequest) = ApiResponse.success(MatchingWaitSuccessCode.CREATE_WAIT_SUCCESS, matchingWaitService.enrollMatchingWait(request))
+
+    @DeleteMapping
+    fun deleteMatchingWait() = ApiResponse.success(MatchingWaitSuccessCode.REMOVE_WAIT_SUCCESS, matchingWaitService.cancelMatchingWait())
 }
