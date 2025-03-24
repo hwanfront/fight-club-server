@@ -5,6 +5,7 @@ import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitRequest
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitResponse
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitAlreadyExistsException
+import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitNotFoundException
 import com.fightclub.fight_club_server.matchingWait.repository.MatchingWaitRepository
 import com.fightclub.fight_club_server.meta.enums.WeightClass
 import com.fightclub.fight_club_server.user.domain.User
@@ -16,6 +17,23 @@ import org.springframework.stereotype.Service
 class MatchingWaitService(
     val matchingWaitRepository: MatchingWaitRepository
 ) {
+    fun getMyMatchingWait(): MatchingWaitResponse {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication == null || !authentication.isAuthenticated) {
+            throw UnauthorizedException()
+        }
+
+        val user = authentication.principal as? User ?: throw UserNotFoundException()
+        val matchingWait = matchingWaitRepository.findByUserId(user.id!!)
+            ?: throw MatchingWaitNotFoundException()
+
+        return MatchingWaitResponse(
+            weight = matchingWait.weight,
+            weightClass = matchingWait.weightClass,
+            createdAt = matchingWait.createdAt,
+        )
+    }
+
     fun enrollMatchingWait(request: MatchingWaitRequest): MatchingWaitResponse {
         val authentication = SecurityContextHolder.getContext().authentication
         if (authentication == null || !authentication.isAuthenticated) {
