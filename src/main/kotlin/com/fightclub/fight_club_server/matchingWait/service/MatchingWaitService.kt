@@ -74,4 +74,28 @@ class MatchingWaitService(
 
         matchingWaitRepository.delete(matchingWait)
     }
+
+    fun updateMatchingWait(request: MatchingWaitRequest): MatchingWaitResponse {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication == null || !authentication.isAuthenticated) {
+            throw UnauthorizedException()
+        }
+
+        val user = authentication.principal as? User ?: throw UserNotFoundException()
+        val matchingWait = matchingWaitRepository.findByUserId(user.id!!)
+            ?: throw MatchingWaitNotFoundException()
+
+        matchingWait.updateMatchingWait(
+            weight = request.weight,
+            weightClass = WeightClass.fromWeight(request.weight),
+        )
+
+        matchingWaitRepository.save(matchingWait)
+
+        return MatchingWaitResponse(
+            weight = matchingWait.weight,
+            weightClass = matchingWait.weightClass,
+            createdAt = matchingWait.createdAt,
+        )
+    }
 }

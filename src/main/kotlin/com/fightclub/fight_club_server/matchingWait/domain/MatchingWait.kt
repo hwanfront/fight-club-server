@@ -12,9 +12,16 @@ class MatchingWait (
 
     val userId: Long = 0L,
 
-    val weight: Double = 0.0,
+    var weight: Double = 0.0,
 
-    val weightClass: WeightClass,
+    var weightClass: WeightClass,
 
-    val createdAt: LocalDateTime = LocalDateTime.now()
-)
+    var createdAt: LocalDateTime = LocalDateTime.now()
+) {
+    fun updateMatchingWait(weight: Double, weightClass: WeightClass) {
+        this.weight = weight
+        this.weightClass = weightClass
+        this.createdAt = LocalDateTime.now()
+    }
+
+}
