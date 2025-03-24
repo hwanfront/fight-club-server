@@ -2,6 +2,7 @@ package com.fightclub.fight_club_server.matchingWait.service
 
 import com.fightclub.fight_club_server.common.exception.UnauthorizedException
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
+import com.fightclub.fight_club_server.matchingWait.dto.MatchingCandidateResponse
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitRequest
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitResponse
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitAlreadyExistsException
@@ -97,5 +98,32 @@ class MatchingWaitService(
             weightClass = matchingWait.weightClass,
             createdAt = matchingWait.createdAt,
         )
+    }
+
+    fun getCandidateList(): List<MatchingCandidateResponse> {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication == null || !authentication.isAuthenticated) {
+            throw UnauthorizedException()
+        }
+
+        val user = authentication.principal as? User ?: throw UserNotFoundException()
+        val userId = user.id!!
+        val myWait = matchingWaitRepository.findByUserId(userId)
+            ?: throw MatchingWaitNotFoundException()
+
+        val candidateList =  matchingWaitRepository.findCandidateListByWeightClassRandom(
+            weightClass = myWait.weightClass.name,
+            userId = userId,
+            limit = 10
+        )
+
+        return candidateList.map {
+            MatchingCandidateResponse(
+                userId = it.getUserId(),
+                nickname = it.getNickname(),
+                weight = it.getWeight(),
+                weightClass = WeightClass.fromName(it.getWeightClass()),
+            )
+        }
     }
 }

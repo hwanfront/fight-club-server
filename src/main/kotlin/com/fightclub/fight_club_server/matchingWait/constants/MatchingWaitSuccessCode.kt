@@ -12,4 +12,5 @@ enum class MatchingWaitSuccessCode(
     CREATE_WAIT_SUCCESS(HttpStatus.OK,"MWS002", "매칭 대기를 등록했습니다."),
     REMOVE_WAIT_SUCCESS(HttpStatus.OK,"MWS003", "매칭 대기를 삭제했습니다."),
     UPDATE_WAIT_SUCCESS(HttpStatus.OK,"MWS004", "매칭 대기를 수정했습니다."),
+    GET_CANDIDATE_LIST_SUCCESS(HttpStatus.OK,"MWS005", "체급에 맞는 매칭 대기 정보를 불러왔습니다."),
 }

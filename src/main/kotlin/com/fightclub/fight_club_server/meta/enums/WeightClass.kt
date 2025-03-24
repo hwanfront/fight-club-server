@@ -1,6 +1,7 @@
 package com.fightclub.fight_club_server.meta.enums
 
 import com.fightclub.fight_club_server.meta.dto.WeightClassResponse
+import com.fightclub.fight_club_server.meta.exception.WeightClassNotFoundException
 
 enum class WeightClass(
     val displayName: String,
@@ -35,6 +36,13 @@ enum class WeightClass(
                 ?: SUPER_HEAVY
         }
 
+        fun fromName(name: String): WeightClass {
+            try {
+                return WeightClass.valueOf(name)
+            } catch (e: IllegalArgumentException) {
+                throw WeightClassNotFoundException()
+            }
+        }
     }
 
 }

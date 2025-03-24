@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 class MatchingWaitController(
     private val matchingWaitService: MatchingWaitService
 ) {
-    @GetMapping("me")
+    @GetMapping("/me")
     fun getMyMatchingWait() = ApiResponse.success(MatchingWaitSuccessCode.GET_MY_WAIT_SUCCESS, matchingWaitService.getMyMatchingWait())
 
     @PostMapping
@@ -23,4 +23,7 @@ class MatchingWaitController(
 
     @PatchMapping
     fun updateMatchingWait(@Valid @RequestBody request: MatchingWaitRequest) = ApiResponse.success(MatchingWaitSuccessCode.UPDATE_WAIT_SUCCESS, matchingWaitService.updateMatchingWait(request))
+
+    @GetMapping("/candidate")
+    fun getRandomCandidateList() = ApiResponse.success(MatchingWaitSuccessCode.GET_CANDIDATE_LIST_SUCCESS, matchingWaitService.getCandidateList())
 }
