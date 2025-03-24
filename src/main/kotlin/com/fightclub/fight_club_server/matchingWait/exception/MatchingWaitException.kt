@@ -1,0 +1,6 @@
+package com.fightclub.fight_club_server.matchingWait.exception
+
+import com.fightclub.fight_club_server.common.exception.BaseException
+import com.fightclub.fight_club_server.matchingWait.constants.MatchingWaitErrorCode
+
+class MatchingWaitAlreadyExistsException : BaseException(MatchingWaitErrorCode.MATCHING_WAIT_ALREADY_EXISTS)
