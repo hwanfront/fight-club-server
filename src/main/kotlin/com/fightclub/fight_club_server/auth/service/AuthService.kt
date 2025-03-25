@@ -9,6 +9,7 @@ import com.fightclub.fight_club_server.jwt.TokenProvider
 import com.fightclub.fight_club_server.jwt.domain.RefreshToken
 import com.fightclub.fight_club_server.jwt.repository.RefreshTokenRepository
 import com.fightclub.fight_club_server.user.domain.User
+import com.fightclub.fight_club_server.user.domain.UserStatus
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.transaction.Transactional
@@ -28,6 +29,7 @@ class AuthService(
     @Transactional
     fun login(@RequestBody loginRequest: LoginRequest): LoginResponse {
         val user = userRepository.findByEmail(loginRequest.email)
+            ?.takeIf { it.status != UserStatus.DELETED }
             ?: throw UserNotFoundException()
 
         if (!passwordEncoder.matches(loginRequest.password, user.password)) {

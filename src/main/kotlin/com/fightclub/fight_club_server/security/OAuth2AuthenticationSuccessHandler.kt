@@ -5,6 +5,7 @@ import com.fightclub.fight_club_server.jwt.domain.RefreshToken
 import com.fightclub.fight_club_server.jwt.repository.RefreshTokenRepository
 import com.fightclub.fight_club_server.security.userinfo.OAuth2UserInfoFactory
 import com.fightclub.fight_club_server.user.domain.AuthProvider
+import com.fightclub.fight_club_server.user.domain.UserStatus
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -40,6 +41,7 @@ class OAuth2AuthenticationSuccessHandler(
         val providerId = strategy.extractProviderId(oAuth2User.attributes)
 
         val user = userRepository.findByProviderAndProviderId(provider, providerId)
+            ?.takeIf { it.status != UserStatus.DELETED }
             ?: return response.sendRedirect("/error")
         val userId = user.id!!
         val accessToken = tokenProvider.generateAccessToken(userId)
