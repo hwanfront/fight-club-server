@@ -13,16 +13,16 @@ class MatchingWaitController(
     private val matchingWaitService: MatchingWaitService
 ) {
     @GetMapping("/me")
-    fun getMyMatchingWait() = ApiResponse.success(MatchingWaitSuccessCode.GET_MY_WAIT_SUCCESS, matchingWaitService.getMyMatchingWait())
+    fun getMyMatchingWait() = ApiResponse.success(MatchingWaitSuccessCode.GET_MY_MATCHING_WAIT_SUCCESS, matchingWaitService.getMyMatchingWait())
 
     @PostMapping
-    fun createMatchingWait(@Valid @RequestBody request: MatchingWaitRequest) = ApiResponse.success(MatchingWaitSuccessCode.CREATE_WAIT_SUCCESS, matchingWaitService.enrollMatchingWait(request))
+    fun createMatchingWait(@Valid @RequestBody request: MatchingWaitRequest) = ApiResponse.success(MatchingWaitSuccessCode.CREATE_MATCHING_WAIT_SUCCESS, matchingWaitService.enrollMatchingWait(request))
 
     @DeleteMapping
-    fun deleteMatchingWait() = ApiResponse.success(MatchingWaitSuccessCode.REMOVE_WAIT_SUCCESS, matchingWaitService.cancelMatchingWait())
+    fun deleteMatchingWait() = ApiResponse.success(MatchingWaitSuccessCode.REMOVE_MATCHING_WAIT_SUCCESS, matchingWaitService.cancelMatchingWait())
 
     @PatchMapping
-    fun updateMatchingWait(@Valid @RequestBody request: MatchingWaitRequest) = ApiResponse.success(MatchingWaitSuccessCode.UPDATE_WAIT_SUCCESS, matchingWaitService.updateMatchingWait(request))
+    fun updateMatchingWait(@Valid @RequestBody request: MatchingWaitRequest) = ApiResponse.success(MatchingWaitSuccessCode.UPDATE_MATCHING_WAIT_SUCCESS, matchingWaitService.updateMatchingWait(request))
 
     @GetMapping("/candidate")
     fun getRandomCandidateList() = ApiResponse.success(MatchingWaitSuccessCode.GET_CANDIDATE_LIST_SUCCESS, matchingWaitService.getCandidateList())
