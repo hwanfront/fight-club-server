@@ -143,6 +143,7 @@ class MatchingWaitService(
             ?: throw MatchingWaitNotFoundException()
         val matchProposal = senderWait.sendRequestTo(receiverWait)
 
-        matchProposalRepository.save(matchProposal)
+        val savedMatchProposal = matchProposalRepository.save(matchProposal)
+        notificationService.notifyMatchProposal(savedMatchProposal)
     }
 }
