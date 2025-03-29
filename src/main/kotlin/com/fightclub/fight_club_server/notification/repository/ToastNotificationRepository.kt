@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface ToastNotificationRepository: JpaRepository<ToastNotification, Long> {
     fun findByUserAndType(user: User, type: NotificationType): ToastNotification?
+    fun findByUser(user: User): List<ToastNotification>
 }

@@ -1,6 +1,7 @@
 package com.fightclub.fight_club_server.sse.service
 
 import com.fightclub.fight_club_server.common.exception.UnauthorizedException
+import com.fightclub.fight_club_server.notification.service.NotificationService
 import com.fightclub.fight_club_server.sse.SseEmitterStore
 import com.fightclub.fight_club_server.user.domain.User
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 @Service
 class SseService(
     private val sseEmitterStore: SseEmitterStore,
+    private val notificationService: NotificationService
 ) {
     fun connect(): SseEmitter {
         val authentication = SecurityContextHolder.getContext().authentication
@@ -26,6 +28,8 @@ class SseService(
 
         emitter.onCompletion { sseEmitterStore.remove(userId) }
         emitter.onTimeout { sseEmitterStore.remove(userId) }
+
+        notificationService.sendAllActiveToastNotifications(user, emitter)
 
         return emitter
     }
