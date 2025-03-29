@@ -1,22 +1,26 @@
 package com.fightclub.fight_club_server.matchingWait.service
 
 import com.fightclub.fight_club_server.common.exception.UnauthorizedException
+import com.fightclub.fight_club_server.matchProposal.repository.MatchProposalRepository
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
-import com.fightclub.fight_club_server.matchingWait.dto.MatchingCandidateResponse
-import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitRequest
-import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitResponse
+import com.fightclub.fight_club_server.matchingWait.dto.*
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitAlreadyExistsException
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitNotFoundException
 import com.fightclub.fight_club_server.matchingWait.repository.MatchingWaitRepository
 import com.fightclub.fight_club_server.meta.enums.WeightClass
+import com.fightclub.fight_club_server.notification.service.NotificationService
+import com.fightclub.fight_club_server.sse.service.SseService
 import com.fightclub.fight_club_server.user.domain.User
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
+import jakarta.transaction.Transactional
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
 @Service
 class MatchingWaitService(
-    val matchingWaitRepository: MatchingWaitRepository
+    private val matchingWaitRepository: MatchingWaitRepository,
+    private val matchProposalRepository: MatchProposalRepository,
+    private val notificationService: NotificationService
 ) {
     fun getMyMatchingWait(): MatchingWaitResponse {
         val authentication = SecurityContextHolder.getContext().authentication
@@ -25,7 +29,7 @@ class MatchingWaitService(
         }
 
         val user = authentication.principal as? User ?: throw UserNotFoundException()
-        val matchingWait = matchingWaitRepository.findByUserId(user.id!!)
+        val matchingWait = matchingWaitRepository.findByUser(user)
             ?: throw MatchingWaitNotFoundException()
 
         return MatchingWaitResponse(
@@ -42,14 +46,13 @@ class MatchingWaitService(
         }
 
         val user = authentication.principal as? User ?: throw UserNotFoundException()
-        val userId = user.id!!
 
-        if (matchingWaitRepository.existsByUserId(userId)) {
+        if (matchingWaitRepository.existsByUserId(user.id!!)) {
             throw MatchingWaitAlreadyExistsException()
         }
 
         val matchingWait = MatchingWait(
-            userId = userId,
+            user = user,
             weight = request.weight,
             weightClass = WeightClass.fromWeight(request.weight),
         )
@@ -70,7 +73,7 @@ class MatchingWaitService(
         }
 
         val user = authentication.principal as? User ?: throw UserNotFoundException()
-        val matchingWait = matchingWaitRepository.findByUserId(user.id!!)
+        val matchingWait = matchingWaitRepository.findByUser(user)
             ?: throw MatchingWaitNotFoundException()
 
         matchingWaitRepository.delete(matchingWait)
@@ -83,7 +86,7 @@ class MatchingWaitService(
         }
 
         val user = authentication.principal as? User ?: throw UserNotFoundException()
-        val matchingWait = matchingWaitRepository.findByUserId(user.id!!)
+        val matchingWait = matchingWaitRepository.findByUser(user)
             ?: throw MatchingWaitNotFoundException()
 
         matchingWait.updateMatchingWait(
@@ -107,13 +110,12 @@ class MatchingWaitService(
         }
 
         val user = authentication.principal as? User ?: throw UserNotFoundException()
-        val userId = user.id!!
-        val myWait = matchingWaitRepository.findByUserId(userId)
+        val myWait = matchingWaitRepository.findByUser(user)
             ?: throw MatchingWaitNotFoundException()
 
         val candidateList =  matchingWaitRepository.findCandidateListByWeightClassRandom(
             weightClass = myWait.weightClass.name,
-            userId = userId,
+            userId = user.id!!,
             limit = 10
         )
 
@@ -125,5 +127,22 @@ class MatchingWaitService(
                 weightClass = WeightClass.fromName(it.getWeightClass()),
             )
         }
+    }
+
+    @Transactional
+    fun sendMatchProposal(request: SendMatchRequest) {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication == null || !authentication.isAuthenticated) {
+            throw UnauthorizedException()
+        }
+
+        val user = authentication.principal as? User ?: throw UserNotFoundException()
+        val senderWait = matchingWaitRepository.findByUserId(user.id!!)
+            ?: throw MatchingWaitNotFoundException()
+        val receiverWait = matchingWaitRepository.findByUserId(request.receiverId)
+            ?: throw MatchingWaitNotFoundException()
+        val matchProposal = senderWait.sendRequestTo(receiverWait)
+
+        matchProposalRepository.save(matchProposal)
     }
 }
