@@ -1,5 +1,6 @@
 package com.fightclub.fight_club_server.jwt
 
+import com.fightclub.fight_club_server.security.CustomUserDetails
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.servlet.FilterChain
@@ -26,6 +27,7 @@ class JwtAuthenticationFilter(
                 val userId = tokenProvider.getUserIdFromToken(token)
                 val user = userRepository.findById(userId)
                     .orElseThrow{ UserNotFoundException() }
+                val userDetails = CustomUserDetails(user)
 
                 val authToken = UsernamePasswordAuthenticationToken(user, null, user.authorities)
 
