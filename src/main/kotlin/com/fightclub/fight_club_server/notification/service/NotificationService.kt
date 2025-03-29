@@ -52,14 +52,7 @@ class NotificationService(
 //        saveDetail(matchProposal.sender, NotificationType.MATCH_ACCEPTED, "${matchProposal.receiver.nickname} 님의 스파링 제안이 수락되었습니다.")
 //    }
 
-    fun deleteToastNotification(type: NotificationType) {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
-
+    fun deleteToastNotification(user: User, type: NotificationType) {
         val toastNotification = toastNotificationRepository.findByUserAndType(user, type)
             ?: throw ToastNotificationNotFoundException()
 
