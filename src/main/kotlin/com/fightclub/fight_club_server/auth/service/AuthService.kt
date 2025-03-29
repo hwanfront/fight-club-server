@@ -60,14 +60,8 @@ class AuthService(
         )
     }
 
-    fun logout(@RequestBody logoutRequest: LogoutRequest) {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
-        val userId = user.id!!
-        val refreshToken = refreshTokenRepository.findByUserId(userId)
+    fun logout(user: User, logoutRequest: LogoutRequest) {
+        val refreshToken = refreshTokenRepository.findByUserId(user.id!!)
             ?: throw RefreshTokenNotFoundException()
 
         if(refreshToken.tokenValue != logoutRequest.refreshToken) {
@@ -77,7 +71,7 @@ class AuthService(
         refreshTokenRepository.delete(refreshToken)
     }
 
-    fun refreshToken(@RequestBody refreshRequest: RefreshRequest): RefreshResponse {
+    fun refreshToken(refreshRequest: RefreshRequest): RefreshResponse {
         val refreshToken = refreshRequest.refreshToken
             ?: throw InvalidRefreshTokenException()
 
