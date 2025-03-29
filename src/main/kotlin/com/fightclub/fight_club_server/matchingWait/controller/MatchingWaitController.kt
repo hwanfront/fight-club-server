@@ -5,7 +5,10 @@ import com.fightclub.fight_club_server.matchingWait.constants.MatchingWaitSucces
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitRequest
 import com.fightclub.fight_club_server.matchingWait.dto.SendMatchRequest
 import com.fightclub.fight_club_server.matchingWait.service.MatchingWaitService
+import com.fightclub.fight_club_server.user.domain.User
 import jakarta.validation.Valid
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -14,20 +17,41 @@ class MatchingWaitController(
     private val matchingWaitService: MatchingWaitService
 ) {
     @GetMapping("/me")
-    fun getMyMatchingWait() = ApiResponse.success(MatchingWaitSuccessCode.GET_MY_MATCHING_WAIT_SUCCESS, matchingWaitService.getMyMatchingWait())
+    @PreAuthorize("isAuthenticated()")
+    fun getMyMatchingWait(
+        @AuthenticationPrincipal user: User
+    ) = ApiResponse.success(MatchingWaitSuccessCode.GET_MY_MATCHING_WAIT_SUCCESS, matchingWaitService.getMyMatchingWait(user))
 
     @PostMapping
-    fun createMatchingWait(@Valid @RequestBody request: MatchingWaitRequest) = ApiResponse.success(MatchingWaitSuccessCode.CREATE_MATCHING_WAIT_SUCCESS, matchingWaitService.enrollMatchingWait(request))
+    @PreAuthorize("isAuthenticated()")
+    fun createMatchingWait(
+        @AuthenticationPrincipal user: User,
+        @Valid @RequestBody request: MatchingWaitRequest
+    ) = ApiResponse.success(MatchingWaitSuccessCode.CREATE_MATCHING_WAIT_SUCCESS, matchingWaitService.enrollMatchingWait(user, request))
 
     @DeleteMapping
-    fun deleteMatchingWait() = ApiResponse.success(MatchingWaitSuccessCode.DELETE_MATCHING_WAIT_SUCCESS, matchingWaitService.cancelMatchingWait())
+    @PreAuthorize("isAuthenticated()")
+    fun deleteMatchingWait(
+        @AuthenticationPrincipal user: User
+    ) = ApiResponse.success(MatchingWaitSuccessCode.DELETE_MATCHING_WAIT_SUCCESS, matchingWaitService.cancelMatchingWait(user))
 
     @PatchMapping
-    fun updateMatchingWait(@Valid @RequestBody request: MatchingWaitRequest) = ApiResponse.success(MatchingWaitSuccessCode.UPDATE_MATCHING_WAIT_SUCCESS, matchingWaitService.updateMatchingWait(request))
+    @PreAuthorize("isAuthenticated()")
+    fun updateMatchingWait(
+        @AuthenticationPrincipal user: User,
+        @Valid @RequestBody request: MatchingWaitRequest
+    ) = ApiResponse.success(MatchingWaitSuccessCode.UPDATE_MATCHING_WAIT_SUCCESS, matchingWaitService.updateMatchingWait(user, request))
 
     @GetMapping("/candidate")
-    fun getRandomCandidateList() = ApiResponse.success(MatchingWaitSuccessCode.GET_CANDIDATE_LIST_SUCCESS, matchingWaitService.getCandidateList())
+    @PreAuthorize("isAuthenticated()")
+    fun getRandomCandidateList(
+        @AuthenticationPrincipal user: User
+    ) = ApiResponse.success(MatchingWaitSuccessCode.GET_CANDIDATE_LIST_SUCCESS, matchingWaitService.getCandidateList(user))
 
     @PostMapping("/send")
-    fun createSendMatchProposal(@Valid @RequestBody request: SendMatchRequest) = ApiResponse.success(MatchingWaitSuccessCode.SEND_MATCH_PROPOSAL_SUCCESS, matchingWaitService.sendMatchProposal(request))
+    @PreAuthorize("isAuthenticated()")
+    fun createSendMatchProposal(
+        @AuthenticationPrincipal user: User,
+        @Valid @RequestBody request: SendMatchRequest
+    ) = ApiResponse.success(MatchingWaitSuccessCode.SEND_MATCH_PROPOSAL_SUCCESS, matchingWaitService.sendMatchProposal(user, request))
 }

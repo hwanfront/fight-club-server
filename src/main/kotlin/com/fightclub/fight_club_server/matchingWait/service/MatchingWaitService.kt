@@ -22,13 +22,7 @@ class MatchingWaitService(
     private val matchProposalRepository: MatchProposalRepository,
     private val notificationService: NotificationService
 ) {
-    fun getMyMatchingWait(): MatchingWaitResponse {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
+    fun getMyMatchingWait(user: User): MatchingWaitResponse {
         val matchingWait = matchingWaitRepository.findByUser(user)
             ?: throw MatchingWaitNotFoundException()
 
@@ -39,13 +33,7 @@ class MatchingWaitService(
         )
     }
 
-    fun enrollMatchingWait(request: MatchingWaitRequest): MatchingWaitResponse {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
+    fun enrollMatchingWait(user: User, request: MatchingWaitRequest): MatchingWaitResponse {
 
         if (matchingWaitRepository.existsByUserId(user.id!!)) {
             throw MatchingWaitAlreadyExistsException()
@@ -66,26 +54,14 @@ class MatchingWaitService(
         )
     }
 
-    fun cancelMatchingWait() {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
+    fun cancelMatchingWait(user: User) {
         val matchingWait = matchingWaitRepository.findByUser(user)
             ?: throw MatchingWaitNotFoundException()
 
         matchingWaitRepository.delete(matchingWait)
     }
 
-    fun updateMatchingWait(request: MatchingWaitRequest): MatchingWaitResponse {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
+    fun updateMatchingWait(user: User, request: MatchingWaitRequest): MatchingWaitResponse {
         val matchingWait = matchingWaitRepository.findByUser(user)
             ?: throw MatchingWaitNotFoundException()
 
@@ -103,13 +79,7 @@ class MatchingWaitService(
         )
     }
 
-    fun getCandidateList(): List<MatchingCandidateResponse> {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
+    fun getCandidateList(user: User): List<MatchingCandidateResponse> {
         val myWait = matchingWaitRepository.findByUser(user)
             ?: throw MatchingWaitNotFoundException()
 
@@ -130,17 +100,9 @@ class MatchingWaitService(
     }
 
     @Transactional
-    fun sendMatchProposal(request: SendMatchRequest) {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
-        val senderWait = matchingWaitRepository.findByUserId(user.id!!)
-            ?: throw MatchingWaitNotFoundException()
-        val receiverWait = matchingWaitRepository.findByUserId(request.receiverId)
-            ?: throw MatchingWaitNotFoundException()
+    fun sendMatchProposal(user: User, request: SendMatchRequest) {
+        val senderWait = matchingWaitRepository.findByUserId(user.id!!) ?: throw MatchingWaitNotFoundException()
+        val receiverWait = matchingWaitRepository.findByUserId(request.receiverId) ?: throw MatchingWaitNotFoundException()
         val matchProposal = senderWait.sendRequestTo(receiverWait)
 
         val savedMatchProposal = matchProposalRepository.save(matchProposal)
