@@ -47,6 +47,25 @@ class NotificationService(
         }
     }
 
+//    fun notifyMatchAccepted(matchProposal: MatchProposal) {
+//        sendToast(matchProposal.sender, NotificationType.MATCH_ACCEPTED, "스파링 제안이 수락되었습니다.")
+//        saveDetail(matchProposal.sender, NotificationType.MATCH_ACCEPTED, "${matchProposal.receiver.nickname} 님의 스파링 제안이 수락되었습니다.")
+//    }
+
+    fun deleteToastNotification(type: NotificationType) {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication == null || !authentication.isAuthenticated) {
+            throw UnauthorizedException()
+        }
+
+        val user = authentication.principal as? User ?: throw UserNotFoundException()
+
+        val toastNotification = toastNotificationRepository.findByUserAndType(user, type)
+            ?: throw ToastNotificationNotFoundException()
+
+        toastNotificationRepository.delete(toastNotification)
+    }
+
     private fun sendToast(user: User, type: NotificationType, message: String) {
         var toastNotification = toastNotificationRepository.findByUserAndType(user, type)
 
