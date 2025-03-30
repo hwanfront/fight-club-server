@@ -1,0 +1,6 @@
+package com.fightclub.fight_club_server.notification.exception
+
+import com.fightclub.fight_club_server.common.exception.BaseException
+import com.fightclub.fight_club_server.notification.constants.NotificationErrorCode
+
+class ToastNotificationNotFoundException : BaseException(NotificationErrorCode.TOAST_NOTIFICATIONS_NOT_FOUND)

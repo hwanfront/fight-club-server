@@ -1,6 +1,8 @@
 package com.fightclub.fight_club_server.matchingWait.domain
 
+import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
 import com.fightclub.fight_club_server.meta.enums.WeightClass
+import com.fightclub.fight_club_server.user.domain.User
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -10,7 +12,9 @@ class MatchingWait (
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    val userId: Long = 0L,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    val user: User,
 
     var weight: Double = 0.0,
 
@@ -25,4 +29,10 @@ class MatchingWait (
         this.createdAt = LocalDateTime.now()
     }
 
+    fun sendRequestTo(other: MatchingWait): MatchProposal {
+        return MatchProposal(
+            sender = this.user,
+            receiver = other.user
+        )
+    }
 }
