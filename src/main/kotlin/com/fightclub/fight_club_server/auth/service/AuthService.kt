@@ -4,16 +4,14 @@ import com.fightclub.fight_club_server.auth.dto.*
 import com.fightclub.fight_club_server.auth.exception.InvalidPasswordException
 import com.fightclub.fight_club_server.auth.exception.InvalidRefreshTokenException
 import com.fightclub.fight_club_server.auth.exception.RefreshTokenNotFoundException
-import com.fightclub.fight_club_server.common.exception.UnauthorizedException
-import com.fightclub.fight_club_server.jwt.TokenProvider
-import com.fightclub.fight_club_server.jwt.domain.RefreshToken
-import com.fightclub.fight_club_server.jwt.repository.RefreshTokenRepository
+import com.fightclub.fight_club_server.security.jwt.TokenProvider
+import com.fightclub.fight_club_server.security.jwt.domain.RefreshToken
+import com.fightclub.fight_club_server.security.jwt.repository.RefreshTokenRepository
 import com.fightclub.fight_club_server.user.domain.User
 import com.fightclub.fight_club_server.user.domain.UserStatus
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.transaction.Transactional
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestBody
@@ -60,14 +58,8 @@ class AuthService(
         )
     }
 
-    fun logout(@RequestBody logoutRequest: LogoutRequest) {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
-        val userId = user.id!!
-        val refreshToken = refreshTokenRepository.findByUserId(userId)
+    fun logout(user: User, logoutRequest: LogoutRequest) {
+        val refreshToken = refreshTokenRepository.findByUserId(user.id!!)
             ?: throw RefreshTokenNotFoundException()
 
         if(refreshToken.tokenValue != logoutRequest.refreshToken) {
@@ -77,7 +69,7 @@ class AuthService(
         refreshTokenRepository.delete(refreshToken)
     }
 
-    fun refreshToken(@RequestBody refreshRequest: RefreshRequest): RefreshResponse {
+    fun refreshToken(refreshRequest: RefreshRequest): RefreshResponse {
         val refreshToken = refreshRequest.refreshToken
             ?: throw InvalidRefreshTokenException()
 

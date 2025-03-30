@@ -1,9 +1,11 @@
 package com.fightclub.fight_club_server.security
 
 import com.fightclub.fight_club_server.config.CorsConfig
-import com.fightclub.fight_club_server.jwt.JwtAuthenticationFilter
+import com.fightclub.fight_club_server.security.jwt.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -26,7 +28,7 @@ class SecurityConfig(
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/auth/**", "/api/users/signup").permitAll()
+                it.requestMatchers("/api/auth/**", "/api/auth/refresh", "/api/users/signup").permitAll()
                 it.anyRequest().authenticated()
             }
             .oauth2Login {
@@ -36,5 +38,13 @@ class SecurityConfig(
             .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
+    }
+
+
+    @Bean
+    fun authenticationManager(http: HttpSecurity): AuthenticationManager {
+        return http
+            .getSharedObject(AuthenticationManagerBuilder::class.java)
+            .build()
     }
 }

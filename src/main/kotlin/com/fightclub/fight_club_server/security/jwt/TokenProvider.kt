@@ -1,4 +1,4 @@
-package com.fightclub.fight_club_server.jwt
+package com.fightclub.fight_club_server.security.jwt
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm

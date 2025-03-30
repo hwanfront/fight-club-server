@@ -1,4 +1,4 @@
-package com.fightclub.fight_club_server.jwt
+package com.fightclub.fight_club_server.security.jwt
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component

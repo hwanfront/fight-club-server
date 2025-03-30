@@ -1,7 +1,6 @@
 package com.fightclub.fight_club_server.user.service
 
-import com.fightclub.fight_club_server.common.exception.UnauthorizedException
-import com.fightclub.fight_club_server.jwt.repository.RefreshTokenRepository
+import com.fightclub.fight_club_server.security.jwt.repository.RefreshTokenRepository
 import com.fightclub.fight_club_server.user.domain.User
 import com.fightclub.fight_club_server.user.domain.UserStatus
 import com.fightclub.fight_club_server.user.dto.*
@@ -10,7 +9,6 @@ import com.fightclub.fight_club_server.user.exception.UserNotFoundException
 import com.fightclub.fight_club_server.user.exception.UserNotWaitingStatusException
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.transaction.Transactional
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -20,23 +18,11 @@ class UserService(
     private val refreshTokenRepository: RefreshTokenRepository,
     private val bCryptPasswordEncoder: BCryptPasswordEncoder
 ) {
-    fun myInfo(): UserInfoResponse {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
-
+    fun myInfo(user: User): UserInfoResponse {
         return user.toUserInfoResponse()
     }
 
     fun userInfo(userId: Long): UserInfoResponse {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
         val user = userRepository.findById(userId).orElseThrow{ UserNotFoundException() }
 
         return user.toUserInfoResponse()
@@ -53,14 +39,7 @@ class UserService(
         userRepository.save(user)
     }
 
-    fun oAuth2Signup(oAuth2SignupRequest: OAuth2SignupRequest) {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
-
+    fun oAuth2Signup(user: User, oAuth2SignupRequest: OAuth2SignupRequest) {
         if (user.status != UserStatus.WAITING) {
             throw UserNotWaitingStatusException()
         }
@@ -74,14 +53,7 @@ class UserService(
     }
 
     @Transactional
-    fun deleteUser() {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
-
+    fun deleteUser(user: User) {
         user.deleteUser()
         userRepository.save(user)
 

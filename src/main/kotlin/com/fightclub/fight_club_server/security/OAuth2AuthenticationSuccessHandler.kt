@@ -1,10 +1,9 @@
 package com.fightclub.fight_club_server.security
 
-import com.fightclub.fight_club_server.jwt.TokenProvider
-import com.fightclub.fight_club_server.jwt.domain.RefreshToken
-import com.fightclub.fight_club_server.jwt.repository.RefreshTokenRepository
+import com.fightclub.fight_club_server.security.jwt.TokenProvider
+import com.fightclub.fight_club_server.security.jwt.domain.RefreshToken
+import com.fightclub.fight_club_server.security.jwt.repository.RefreshTokenRepository
 import com.fightclub.fight_club_server.security.userinfo.OAuth2UserInfoFactory
-import com.fightclub.fight_club_server.user.domain.AuthProvider
 import com.fightclub.fight_club_server.user.domain.UserStatus
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.servlet.http.HttpServletRequest
@@ -53,10 +52,12 @@ class OAuth2AuthenticationSuccessHandler(
             existRefreshToken.tokenValue = refreshToken
             refreshTokenRepository.save(existRefreshToken)
         } else {
-            refreshTokenRepository.save(RefreshToken(
+            refreshTokenRepository.save(
+                RefreshToken(
                 userId = userId,
                 tokenValue = refreshToken
-            ))
+            )
+            )
         }
         response.sendRedirect("$redirectUri?accessToken=$accessToken&refreshToken=$refreshToken")
     }

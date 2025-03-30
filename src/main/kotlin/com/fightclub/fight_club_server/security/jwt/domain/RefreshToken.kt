@@ -1,4 +1,4 @@
-package com.fightclub.fight_club_server.jwt.domain
+package com.fightclub.fight_club_server.security.jwt.domain
 
 import jakarta.persistence.*
 import java.time.LocalDateTime
