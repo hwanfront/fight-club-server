@@ -14,13 +14,7 @@ class SseService(
     private val sseEmitterStore: SseEmitterStore,
     private val notificationService: NotificationService
 ) {
-    fun connect(): SseEmitter {
-        val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication == null || !authentication.isAuthenticated) {
-            throw UnauthorizedException()
-        }
-
-        val user = authentication.principal as? User ?: throw UserNotFoundException()
+    fun connect(user: User): SseEmitter {
         val userId = user.id!!
         val emitter = SseEmitter(60 * 1000L)
 
