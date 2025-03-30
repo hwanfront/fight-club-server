@@ -15,27 +15,27 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/users")
 class UserController(private val userService: UserService) {
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     fun myInfo(@AuthenticationPrincipal user: User) = ApiResponse.success(UserSuccessCode.MY_INFO_SUCCESS, userService.myInfo(user))
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{userId}")
+    @PreAuthorize("isAuthenticated()")
     fun userInfo(@PathVariable userId: Long) = ApiResponse.success(UserSuccessCode.USER_INFO_SUCCESS, userService.userInfo(userId))
 
-    @PreAuthorize("isAnonymous()")
     @PostMapping("/signup")
+    @PreAuthorize("isAnonymous()")
     fun signup(@Valid @RequestBody signupRequest: SignupRequest) = ApiResponse.success(UserSuccessCode.SIGNUP_SUCCESS, userService.signup(signupRequest))
 
-    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/complete")
+    @PreAuthorize("isAuthenticated()")
     fun oAuth2Signup(
         @AuthenticationPrincipal user: User,
         @Valid @RequestBody oAuth2SignupRequest: OAuth2SignupRequest
     ) = ApiResponse.success(UserSuccessCode.SIGNUP_SUCCESS, userService.oAuth2Signup(user, oAuth2SignupRequest))
 
-    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/delete")
+    @PreAuthorize("isAuthenticated()")
     fun deleteUser(
         @AuthenticationPrincipal user: User
     ) = ApiResponse.success(UserSuccessCode.DELETE_SUCCESS, userService.deleteUser(user))

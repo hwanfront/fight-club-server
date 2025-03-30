@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/auth")
 class AuthController(private val authService: AuthService) {
 
-    @PreAuthorize("isAnonymous()")
     @PostMapping("/login")
+    @PreAuthorize("isAnonymous()")
     fun login(
         @RequestBody loginRequest: LoginRequest
     ) = ApiResponse.success(AuthSuccessCode.LOGIN_SUCCESS, authService.login(loginRequest))
 
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
     fun logout(
         @AuthenticationPrincipal user: User,
         @RequestBody logoutRequest: LogoutRequest

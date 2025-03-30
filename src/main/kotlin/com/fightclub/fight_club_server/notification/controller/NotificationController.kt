@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam
 class NotificationController(
     private val notificationService: NotificationService
 ) {
+
     @DeleteMapping("/toast")
     @PreAuthorize("isAuthenticated()")
     fun deleteToastNotifications(
