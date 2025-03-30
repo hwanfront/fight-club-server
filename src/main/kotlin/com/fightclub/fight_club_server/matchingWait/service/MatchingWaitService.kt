@@ -34,7 +34,6 @@ class MatchingWaitService(
     }
 
     fun enrollMatchingWait(user: User, request: MatchingWaitRequest): MatchingWaitResponse {
-
         if (matchingWaitRepository.existsByUserId(user.id!!)) {
             throw MatchingWaitAlreadyExistsException()
         }
