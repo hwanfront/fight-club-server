@@ -90,14 +90,12 @@ class NotificationService(
     }
 
     private fun saveDetail(user: User, type: NotificationType, message: String): Notification {
-        val notification = notificationRepository.save(
+        return notificationRepository.save(
             Notification(
                 user = user,
                 type = type,
                 message = message
             )
         )
-
-        return notification
     }
 }
