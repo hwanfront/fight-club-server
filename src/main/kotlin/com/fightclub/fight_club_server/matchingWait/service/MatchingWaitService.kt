@@ -6,6 +6,7 @@ import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
 import com.fightclub.fight_club_server.matchingWait.dto.*
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitAlreadyExistsException
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitNotFoundException
+import com.fightclub.fight_club_server.matchingWait.mapper.MatchingWaitMapper
 import com.fightclub.fight_club_server.matchingWait.repository.MatchingWaitRepository
 import com.fightclub.fight_club_server.meta.enums.WeightClass
 import com.fightclub.fight_club_server.notification.service.NotificationService
@@ -20,17 +21,14 @@ import org.springframework.stereotype.Service
 class MatchingWaitService(
     private val matchingWaitRepository: MatchingWaitRepository,
     private val matchProposalRepository: MatchProposalRepository,
-    private val notificationService: NotificationService
+    private val notificationService: NotificationService,
+    private val matchingWaitMapper: MatchingWaitMapper
 ) {
     fun getMyMatchingWait(user: User): MatchingWaitResponse {
         val matchingWait = matchingWaitRepository.findByUser(user)
             ?: throw MatchingWaitNotFoundException()
 
-        return MatchingWaitResponse(
-            weight = matchingWait.weight,
-            weightClass = matchingWait.weightClass,
-            createdAt = matchingWait.createdAt,
-        )
+        return matchingWaitMapper.toResponse(matchingWait)
     }
 
     fun enrollMatchingWait(user: User, request: MatchingWaitRequest): MatchingWaitResponse {
@@ -46,11 +44,7 @@ class MatchingWaitService(
 
         matchingWaitRepository.save(matchingWait)
 
-        return MatchingWaitResponse(
-            weight = matchingWait.weight,
-            weightClass = matchingWait.weightClass,
-            createdAt = matchingWait.createdAt,
-        )
+        return matchingWaitMapper.toResponse(matchingWait)
     }
 
     fun cancelMatchingWait(user: User) {
@@ -71,11 +65,7 @@ class MatchingWaitService(
 
         matchingWaitRepository.save(matchingWait)
 
-        return MatchingWaitResponse(
-            weight = matchingWait.weight,
-            weightClass = matchingWait.weightClass,
-            createdAt = matchingWait.createdAt,
-        )
+        return matchingWaitMapper.toResponse(matchingWait)
     }
 
     fun getCandidateList(user: User): List<MatchingCandidateResponse> {
@@ -88,14 +78,7 @@ class MatchingWaitService(
             limit = 10
         )
 
-        return candidateList.map {
-            MatchingCandidateResponse(
-                userId = it.getUserId(),
-                nickname = it.getNickname(),
-                weight = it.getWeight(),
-                weightClass = WeightClass.fromName(it.getWeightClass()),
-            )
-        }
+        return candidateList.map { matchingWaitMapper.toCandidateResponse(it) }
     }
 
     @Transactional
