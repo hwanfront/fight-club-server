@@ -7,6 +7,7 @@ import com.fightclub.fight_club_server.user.dto.*
 import com.fightclub.fight_club_server.user.exception.UserAlreadyExistsException
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
 import com.fightclub.fight_club_server.user.exception.UserNotWaitingStatusException
+import com.fightclub.fight_club_server.user.mapper.UserMapper
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -16,16 +17,17 @@ import org.springframework.stereotype.Service
 class UserService(
     private val userRepository: UserRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val bCryptPasswordEncoder: BCryptPasswordEncoder
+    private val bCryptPasswordEncoder: BCryptPasswordEncoder,
+    private val userMapper: UserMapper
 ) {
     fun myInfo(user: User): UserInfoResponse {
-        return user.toUserInfoResponse()
+        return userMapper.toUserInfoResponse(user)
     }
 
     fun userInfo(userId: Long): UserInfoResponse {
         val user = userRepository.findById(userId).orElseThrow{ UserNotFoundException() }
 
-        return user.toUserInfoResponse()
+        return userMapper.toUserInfoResponse(user)
     }
 
     fun signup(signupRequest: SignupRequest) {
@@ -34,7 +36,7 @@ class UserService(
         }
 
         val encodedPassword = bCryptPasswordEncoder.encode(signupRequest.password)
-        val user = signupRequest.toUser(encodedPassword)
+        val user = userMapper.fromSignupRequest(signupRequest, encodedPassword)
 
         userRepository.save(user)
     }

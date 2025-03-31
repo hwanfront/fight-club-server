@@ -13,6 +13,9 @@ interface MatchingWaitRepository: JpaRepository<MatchingWait, Long> {
     fun existsByUserId(userId: Long): Boolean
 
     // SELECT 1 -> 성능상 가볍고 의미상 "존재 여부만 본다"는 표현
+    // JPA 에서 네이티브 쿼리 사용할 때, 안정성과 깔끔함 때문에 Projection 을 사용함
+    // Entity 로 매핑하려면 조회한 컬럼이 Entity에 정의된 필드와 정확히 일치해야 하기 때문에
+    // 조인하거나 필요한 필드만 뽑을 때 매핑 오류 발생 가능
     @Query(
         value = """
             SELECT mw.user_id AS userId, u.nickname AS nickname, mw.weight, mw.weight_class AS weightClass
