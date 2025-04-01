@@ -5,11 +5,11 @@ import com.fightclub.fight_club_server.common.constants.ResponseCode
 import org.springframework.http.ResponseEntity
 
 data class BaseResponse<T>(
-    val status: Int,
-    val code: String,
-    val message: String,
-    val data: T? = null
-) {
+    override val status: Int,
+    override val code: String,
+    override val message: String,
+    override val data: T? = null
+): ApiResult<T> {
     // companion object 는 static 역할을 하는데
     // 싱글톤처럼 활용 가능, 싱글톤 객체로 변환
     // 인터페이스에서 사용 가능
