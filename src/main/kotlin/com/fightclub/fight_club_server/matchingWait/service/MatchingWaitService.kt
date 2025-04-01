@@ -1,6 +1,5 @@
 package com.fightclub.fight_club_server.matchingWait.service
 
-import com.fightclub.fight_club_server.common.exception.UnauthorizedException
 import com.fightclub.fight_club_server.matchProposal.repository.MatchProposalRepository
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
 import com.fightclub.fight_club_server.matchingWait.dto.*
@@ -10,11 +9,8 @@ import com.fightclub.fight_club_server.matchingWait.mapper.MatchingWaitMapper
 import com.fightclub.fight_club_server.matchingWait.repository.MatchingWaitRepository
 import com.fightclub.fight_club_server.meta.enums.WeightClass
 import com.fightclub.fight_club_server.notification.service.NotificationService
-import com.fightclub.fight_club_server.sse.service.SseService
 import com.fightclub.fight_club_server.user.domain.User
-import com.fightclub.fight_club_server.user.exception.UserNotFoundException
 import jakarta.transaction.Transactional
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
 @Service
@@ -31,7 +27,7 @@ class MatchingWaitService(
         return matchingWaitMapper.toResponse(matchingWait)
     }
 
-    fun enrollMatchingWait(user: User, request: MatchingWaitRequest): MatchingWaitResponse {
+    fun createMatchingWait(user: User, request: MatchingWaitRequest): MatchingWaitResponse {
         if (matchingWaitRepository.existsByUserId(user.id!!)) {
             throw MatchingWaitAlreadyExistsException()
         }

@@ -1,6 +1,6 @@
 package com.fightclub.fight_club_server.notification.controller
 
-import com.fightclub.fight_club_server.common.dto.ApiResponse
+import com.fightclub.fight_club_server.common.dto.BaseResponse
 import com.fightclub.fight_club_server.notification.constants.NotificationSuccessCode
 import com.fightclub.fight_club_server.notification.domain.NotificationType
 import com.fightclub.fight_club_server.notification.service.NotificationService
@@ -23,5 +23,5 @@ class NotificationController(
     fun deleteToastNotifications(
         @AuthenticationPrincipal user: User,
         @RequestParam type: NotificationType
-    ) = ApiResponse.success(NotificationSuccessCode.DELETE_TOAST_NOTIFICATIONS_SUCCESS, notificationService.deleteToastNotification(user, type))
+    ) = BaseResponse.success(NotificationSuccessCode.DELETE_TOAST_NOTIFICATIONS_SUCCESS, notificationService.deleteToastNotification(user, type))
 }

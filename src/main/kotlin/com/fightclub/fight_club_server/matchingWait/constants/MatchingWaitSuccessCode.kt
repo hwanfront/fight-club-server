@@ -8,10 +8,10 @@ enum class MatchingWaitSuccessCode(
     override val code: String,
     override val message: String
 ): ResponseCode {
-    GET_MY_MATCHING_WAIT_SUCCESS(HttpStatus.OK,"MWS001", "내 매칭 대기 정보를 불러왔습니다."),
-    CREATE_MATCHING_WAIT_SUCCESS(HttpStatus.OK,"MWS002", "매칭 대기를 등록했습니다."),
-    DELETE_MATCHING_WAIT_SUCCESS(HttpStatus.OK,"MWS003", "매칭 대기를 삭제했습니다."),
-    UPDATE_MATCHING_WAIT_SUCCESS(HttpStatus.OK,"MWS004", "매칭 대기를 수정했습니다."),
-    GET_CANDIDATE_LIST_SUCCESS(HttpStatus.OK,"MWS005", "체급에 맞는 매칭 대기 정보를 불러왔습니다."),
-    SEND_MATCH_PROPOSAL_SUCCESS(HttpStatus.OK, "MWS006",  "매치 신청을 보냈습니다.")
+    GET_MY_MATCHING_WAIT_SUCCESS(HttpStatus.OK, MatchingWaitConstants.MyMatchingWaitSuccess.CODE, MatchingWaitConstants.MyMatchingWaitSuccess.MESSAGE),
+    CREATE_MATCHING_WAIT_SUCCESS(HttpStatus.OK, MatchingWaitConstants.CreateMatchingWaitSuccess.CODE, MatchingWaitConstants.CreateMatchingWaitSuccess.MESSAGE),
+    DELETE_MATCHING_WAIT_SUCCESS(HttpStatus.OK, MatchingWaitConstants.DeleteMatchingWaitSuccess.CODE, MatchingWaitConstants.DeleteMatchingWaitSuccess.MESSAGE),
+    UPDATE_MATCHING_WAIT_SUCCESS(HttpStatus.OK, MatchingWaitConstants.UpdateMatchingWaitSuccess.CODE, MatchingWaitConstants.UpdateMatchingWaitSuccess.MESSAGE),
+    GET_CANDIDATE_LIST_SUCCESS(HttpStatus.OK, MatchingWaitConstants.RandomCandidateSuccess.CODE, MatchingWaitConstants.RandomCandidateSuccess.MESSAGE),
+    SEND_MATCH_PROPOSAL_SUCCESS(HttpStatus.OK,  MatchingWaitConstants.CreateSendMatchProposalSuccess.CODE, MatchingWaitConstants.CreateSendMatchProposalSuccess.MESSAGE),
 }
