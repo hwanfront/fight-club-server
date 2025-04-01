@@ -9,8 +9,8 @@ enum class UserSuccessCode(
     override val code: String,
     override val message: String
 ) : ResponseCode {
-    MY_INFO_SUCCESS(HttpStatus.OK, "US001", "내 정보 조회 성공"),
-    USER_INFO_SUCCESS(HttpStatus.OK, "US002", "회원 정보 조회 성공"),
-    SIGNUP_SUCCESS(HttpStatus.OK, "US003", "회원가입 성공"),
-    DELETE_SUCCESS(HttpStatus.OK, "US004", "회웥탈퇴 성공"),
+    MY_INFO_SUCCESS(HttpStatus.OK, UserConstants.MyInfoSuccess.CODE, UserConstants.MyInfoSuccess.MESSAGE),
+    USER_INFO_SUCCESS(HttpStatus.OK, UserConstants.UserInfoSuccess.CODE, UserConstants.UserInfoSuccess.MESSAGE),
+    SIGNUP_SUCCESS(HttpStatus.OK, UserConstants.SignupSuccess.CODE, UserConstants.SignupSuccess.MESSAGE),
+    DELETE_USER_SUCCESS(HttpStatus.OK, UserConstants.DeleteUserSuccess.CODE, UserConstants.DeleteUserSuccess.MESSAGE),
 }
