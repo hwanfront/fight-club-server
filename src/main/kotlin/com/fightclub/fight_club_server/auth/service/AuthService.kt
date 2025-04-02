@@ -62,7 +62,8 @@ class AuthService(
     }
 
     fun logout(user: User, logoutRequest: LogoutRequest) {
-        val refreshToken = refreshTokenRepository.findByUserId(user.id!!)
+        val userId = requireNotNull(user.id) { "User ID must not be null" }
+        val refreshToken = refreshTokenRepository.findByUserId(userId)
             ?: throw RefreshTokenNotFoundException()
 
         if(refreshToken.tokenValue != logoutRequest.refreshToken) {
