@@ -2,6 +2,7 @@ package com.fightclub.fight_club_server.auth.service
 
 import com.fightclub.fight_club_server.auth.dto.LoginRequest
 import com.fightclub.fight_club_server.auth.dto.LogoutRequest
+import com.fightclub.fight_club_server.auth.dto.RefreshRequest
 import com.fightclub.fight_club_server.auth.exception.InvalidPasswordException
 import com.fightclub.fight_club_server.auth.exception.InvalidRefreshTokenException
 import com.fightclub.fight_club_server.auth.exception.RefreshTokenNotFoundException
@@ -182,6 +183,95 @@ class AuthServiceTest {
         // then
         assertThrows(InvalidRefreshTokenException::class.java) {
             authService.logout(user, request)
+        }
+    }
+
+    @Test
+    fun `# refreshToken success`() {
+        // given
+        val userId = 1L
+        val oldRefreshTokenValue = "old-refresh-token"
+        val newAccessToken = "new-access-token"
+        val newRefreshToken = "new-refresh-token"
+
+        val request = RefreshRequest(refreshToken = oldRefreshTokenValue)
+        val storedRefreshToken = RefreshToken(userId = userId, tokenValue = oldRefreshTokenValue)
+
+        given(tokenProvider.validateToken(oldRefreshTokenValue)).willReturn(true)
+        given(tokenProvider.getUserIdFromToken(oldRefreshTokenValue)).willReturn(userId)
+        given(refreshTokenRepository.findByUserId(userId)).willReturn(storedRefreshToken)
+        given(tokenProvider.generateAccessToken(userId)).willReturn(newAccessToken)
+        given(tokenProvider.generateRefreshToken(userId)).willReturn(newRefreshToken)
+
+        // when
+        val result = authService.refreshToken(request)
+
+        // then
+        assertThat(result.accessToken).isEqualTo(newAccessToken)
+        assertThat(result.refreshToken).isEqualTo(newRefreshToken)
+        verify(refreshTokenRepository).save(storedRefreshToken)
+    }
+
+    @Test
+    fun `# refreshToken failed - 요청 토큰 값이 null`() {
+        // given
+        val request = RefreshRequest(refreshToken = null)
+
+        // when
+        // then
+        assertThrows(InvalidRefreshTokenException::class.java) {
+            authService.refreshToken(request)
+        }
+
+    }
+
+    @Test
+    fun `# refreshToken failed - 토큰 검증 실패`() {
+        // given
+        val request = RefreshRequest(refreshToken = "refresh-token")
+
+        given(tokenProvider.validateToken("refresh-token")).willReturn(false)
+
+        // when
+        // then
+        assertThrows(InvalidRefreshTokenException::class.java) {
+            authService.refreshToken(request)
+        }
+
+    }
+
+    @Test
+    fun `# refreshToken failed - 저장된 토큰이 없음`() {
+        // given
+        val userId = 1L
+        val request = RefreshRequest(refreshToken = "refresh-token")
+
+        given(tokenProvider.validateToken("refresh-token")).willReturn(true)
+        given(tokenProvider.getUserIdFromToken("refresh-token")).willReturn(userId)
+        given(refreshTokenRepository.findByUserId(userId)).willReturn(null)
+
+        // when
+        // then
+        assertThrows(RefreshTokenNotFoundException::class.java) {
+            authService.refreshToken(request)
+        }
+    }
+
+    @Test
+    fun `# refreshToken failed - 저장된 토큰과 불일치`() {
+        // given
+        val userId = 1L
+        val request = RefreshRequest(refreshToken = "refresh-token")
+
+        given(tokenProvider.validateToken("refresh-token")).willReturn(true)
+        given(tokenProvider.getUserIdFromToken("refresh-token")).willReturn(userId)
+        given(refreshTokenRepository.findByUserId(userId))
+            .willReturn(RefreshToken(userId = userId, tokenValue = "another-token"))
+
+        // when
+        // then
+        assertThrows(InvalidRefreshTokenException::class.java) {
+            authService.refreshToken(request)
         }
     }
 }
