@@ -1,7 +1,10 @@
 package com.fightclub.fight_club_server.auth.service
 
 import com.fightclub.fight_club_server.auth.dto.LoginRequest
+import com.fightclub.fight_club_server.auth.dto.LogoutRequest
 import com.fightclub.fight_club_server.auth.exception.InvalidPasswordException
+import com.fightclub.fight_club_server.auth.exception.InvalidRefreshTokenException
+import com.fightclub.fight_club_server.auth.exception.RefreshTokenNotFoundException
 import com.fightclub.fight_club_server.security.jwt.TokenProvider
 import com.fightclub.fight_club_server.security.jwt.domain.RefreshToken
 import com.fightclub.fight_club_server.security.jwt.repository.RefreshTokenRepository
@@ -78,7 +81,7 @@ class AuthServiceTest {
         given(tokenProvider.generateRefreshToken(1L)).willReturn("new-refresh-token")
 
         // when
-        val result = authService.login(request)
+        authService.login(request)
 
         // then
         // update 가 있는 경우, 객체 검증을 위해 captor 사용
@@ -132,6 +135,53 @@ class AuthServiceTest {
         // then
         assertThrows(InvalidPasswordException::class.java) {
             authService.login(request)
+        }
+    }
+
+    @Test
+    fun `# logout success`() {
+        // given
+        val user = User(id = 1L, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val refreshToken = RefreshToken(userId = 1L, tokenValue = "refresh-token")
+        val request = LogoutRequest(refreshToken = "refresh-token")
+
+        given(refreshTokenRepository.findByUserId(1)).willReturn(refreshToken)
+
+        // when
+        authService.logout(user, request)
+
+        // then
+        verify(refreshTokenRepository).delete(refreshToken)
+    }
+
+    @Test
+    fun `# logout failed - refresh 토큰이 없는 경우`() {
+        // given
+        val user = User(id = 1L, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val request = LogoutRequest(refreshToken = "refresh-token")
+
+        given(refreshTokenRepository.findByUserId(1)).willReturn(null)
+
+        // when
+        // then
+        assertThrows(RefreshTokenNotFoundException::class.java) {
+            authService.logout(user, request)
+        }
+    }
+
+    @Test
+    fun `# logout failed - 저장된 refresh 토큰의 값과 다른 경우`() {
+        // given
+        val user = User(id = 1L, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val refreshToken = RefreshToken(userId = 1L, tokenValue = "refresh-token")
+        val request = LogoutRequest(refreshToken = "invalid-token")
+
+        given(refreshTokenRepository.findByUserId(1)).willReturn(refreshToken)
+
+        // when
+        // then
+        assertThrows(InvalidRefreshTokenException::class.java) {
+            authService.logout(user, request)
         }
     }
 }
