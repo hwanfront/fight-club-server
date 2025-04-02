@@ -1,7 +1,7 @@
 package com.fightclub.fight_club_server.security.jwt
 
 import com.fightclub.fight_club_server.user.domain.UserStatus
-import com.fightclub.fight_club_server.user.exception.UserDeletedException
+import com.fightclub.fight_club_server.user.exception.DeletedUserException
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.servlet.FilterChain
@@ -30,7 +30,7 @@ class JwtAuthenticationFilter(
                     .orElseThrow{ UserNotFoundException() }
 
                 if (user.status == UserStatus.DELETED) {
-                    throw UserDeletedException()
+                    throw DeletedUserException()
                 }
 
                 val authToken = UsernamePasswordAuthenticationToken(user, null, user.authorities)
