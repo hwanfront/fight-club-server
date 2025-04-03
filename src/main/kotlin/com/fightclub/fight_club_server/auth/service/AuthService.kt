@@ -9,12 +9,12 @@ import com.fightclub.fight_club_server.security.jwt.domain.RefreshToken
 import com.fightclub.fight_club_server.security.jwt.repository.RefreshTokenRepository
 import com.fightclub.fight_club_server.user.domain.User
 import com.fightclub.fight_club_server.user.domain.UserStatus
+import com.fightclub.fight_club_server.user.exception.DeletedUserException
 import com.fightclub.fight_club_server.user.exception.UserNotFoundException
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.RequestBody
 
 @Service
 class AuthService(
@@ -25,10 +25,13 @@ class AuthService(
 ) {
 
     @Transactional
-    fun login(@RequestBody loginRequest: LoginRequest): LoginResponse {
+    fun login(loginRequest: LoginRequest): LoginResponse {
         val user = userRepository.findByEmail(loginRequest.email)
-            ?.takeIf { it.status != UserStatus.DELETED }
             ?: throw UserNotFoundException()
+
+        if (user.status == UserStatus.DELETED) {
+            throw DeletedUserException()
+        }
 
         if (!passwordEncoder.matches(loginRequest.password, user.password)) {
             throw InvalidPasswordException()
@@ -59,7 +62,8 @@ class AuthService(
     }
 
     fun logout(user: User, logoutRequest: LogoutRequest) {
-        val refreshToken = refreshTokenRepository.findByUserId(user.id!!)
+        val userId = requireNotNull(user.id) { "User ID must not be null" }
+        val refreshToken = refreshTokenRepository.findByUserId(userId)
             ?: throw RefreshTokenNotFoundException()
 
         if(refreshToken.tokenValue != logoutRequest.refreshToken) {

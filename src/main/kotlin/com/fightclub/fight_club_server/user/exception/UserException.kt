@@ -6,4 +6,4 @@ import com.fightclub.fight_club_server.common.exception.BaseException
 class UserNotFoundException : BaseException(UserErrorCode.USER_NOT_FOUND)
 class UserAlreadyExistsException : BaseException(UserErrorCode.USER_ALREADY_EXIST)
 class UserNotWaitingStatusException : BaseException(UserErrorCode.USER_NOT_WAITING_STATUS)
-class UserDeletedException : BaseException(UserErrorCode.USER_DELETED)
+class DeletedUserException : BaseException(UserErrorCode.USER_DELETED)
