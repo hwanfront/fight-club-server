@@ -7,7 +7,7 @@ data class UserInfoResponse (
     var email: String,
     val username: String,
     val nickname: String,
-    val providerId: String,
+    val providerId: String?,
     var provider: AuthProvider,
     var role: UserRole
 )
