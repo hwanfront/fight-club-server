@@ -128,7 +128,7 @@ class MatchingWaitServiceTest {
     }
 
     @Test
-    fun `# createMatchingWait failed - 이미 존재하는 메칭 대기 MatchingWaitAlreadyExistsException`() {
+    fun `# createMatchingWait failed - 이미 존재하는 매칭 대기 MatchingWaitAlreadyExistsException`() {
         // given
         val userId = 1L
         val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
@@ -168,7 +168,7 @@ class MatchingWaitServiceTest {
     }
 
     @Test
-    fun `# cancelMatchingWait failed - 존재하지 않는 matchingWait`() {
+    fun `# cancelMatchingWait failed - 존재하지 않는 매칭 대기 MatchingWaitNotFoundException`() {
         // given
         val user = User(id = 1L, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         given(matchingWaitRepository.findByUser(user)).willReturn(null)
@@ -223,7 +223,7 @@ class MatchingWaitServiceTest {
     }
 
     @Test
-    fun `# updateMatchingWait failed - `() {
+    fun `# updateMatchingWait failed - 존재하지 않는 매칭 대기 MatchingWaitNotFoundException`() {
         // given
         val user = User(id = 1L, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val matchingWaitRequest = MatchingWaitRequest(
