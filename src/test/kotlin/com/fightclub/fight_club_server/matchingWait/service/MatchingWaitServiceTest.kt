@@ -2,6 +2,8 @@ package com.fightclub.fight_club_server.matchingWait.service
 
 import com.fightclub.fight_club_server.matchProposal.repository.MatchProposalRepository
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
+import com.fightclub.fight_club_server.matchingWait.dto.MatchingCandidateProjection
+import com.fightclub.fight_club_server.matchingWait.dto.MatchingCandidateResponse
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitRequest
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitResponse
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitAlreadyExistsException
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
@@ -232,6 +235,58 @@ class MatchingWaitServiceTest {
         // then
         assertThrows(MatchingWaitNotFoundException::class.java) {
             matchingWaitService.updateMatchingWait(user, matchingWaitRequest)
+        }
+    }
+
+    @Test
+    fun `# getCandidateList success`() {
+        // given
+        val userId = 1L
+        val weight = 55.0
+        val weightClass = WeightClass.BANTAM
+        val createdAt = LocalDateTime.of(2025, 4, 1, 12, 0)
+        val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val matchingWait = MatchingWait(
+            id = 1L,
+            user = user,
+            weight = weight,
+            weightClass = weightClass,
+            createdAt = createdAt,
+        )
+
+        val projection1 = mock(MatchingCandidateProjection::class.java)
+        val projection2 = mock(MatchingCandidateProjection::class.java)
+        val projection3 = mock(MatchingCandidateProjection::class.java)
+        val candidateProjections = listOf(projection1, projection2, projection3)
+
+        val response1 = MatchingCandidateResponse(userId = 2L, nickname = "userName1", weight = 55.0, weightClass = WeightClass.BANTAM)
+        val response2 = MatchingCandidateResponse(userId = 3L, nickname = "userName3", weight = 54.0, weightClass = WeightClass.BANTAM)
+        val response3 = MatchingCandidateResponse(userId = 4L, nickname = "userName4", weight = 53.0, weightClass = WeightClass.BANTAM)
+
+        given(matchingWaitRepository.findByUser(user)).willReturn(matchingWait)
+        given(matchingWaitRepository.findCandidateListByWeightClassRandom("BANTAM", 1L, 10)).willReturn(candidateProjections)
+        given(matchingWaitMapper.toCandidateResponse(projection1)).willReturn(response1)
+        given(matchingWaitMapper.toCandidateResponse(projection2)).willReturn(response2)
+        given(matchingWaitMapper.toCandidateResponse(projection3)).willReturn(response3)
+
+        // when
+        val result = matchingWaitService.getCandidateList(user)
+
+        // then
+        assertThat(result).containsExactly(response1, response2, response3)
+    }
+
+    @Test
+    fun `# getCandidateList failed - 매칭 대기 상태가 아닌경우 MatchingWaitNotFoundException`() {
+        // given
+        val user = User(id = 1L, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+
+        given(matchingWaitRepository.findByUser(user)).willReturn(null)
+
+        // when
+        // then
+        assertThrows(MatchingWaitNotFoundException::class.java) {
+            matchingWaitService.getCandidateList(user)
         }
     }
 }
