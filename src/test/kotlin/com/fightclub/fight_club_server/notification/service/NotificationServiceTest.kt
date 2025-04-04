@@ -4,6 +4,7 @@ import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
 import com.fightclub.fight_club_server.notification.domain.Notification
 import com.fightclub.fight_club_server.notification.domain.NotificationType
 import com.fightclub.fight_club_server.notification.domain.ToastNotification
+import com.fightclub.fight_club_server.notification.exception.ToastNotificationNotFoundException
 import com.fightclub.fight_club_server.notification.mapper.ToastNotificationMapper
 import com.fightclub.fight_club_server.notification.repository.NotificationRepository
 import com.fightclub.fight_club_server.notification.repository.ToastNotificationRepository
@@ -122,5 +123,42 @@ class NotificationServiceTest {
 
         verify(toastNotificationRepository).findByUserAndType(receiver, NotificationType.MATCH_PROPOSAL)
         verify(notificationRepository).save(any())
+    }
+
+    @Test
+    fun `# deleteToastNotification success`() {
+        // given
+        val user = User(id = 1L, status = UserStatus.REGISTERED)
+        val type = NotificationType.MATCH_PROPOSAL
+        val toastNotification = ToastNotification(
+            id = 1L,
+            user = user,
+            type = type,
+            message = "some message",
+        )
+
+        given(toastNotificationRepository.findByUserAndType(user, type)).willReturn(toastNotification)
+
+        // when
+        notificationService.deleteToastNotification(user, type)
+
+        // then
+        verify(toastNotificationRepository).delete(toastNotification)
+    }
+
+    @Test
+    fun `# deleteToastNotification failed - 존재하지 않는 알림 ToastNotificationNotFoundException`() {
+        // given
+        val user = User(id = 1L, status = UserStatus.REGISTERED)
+        val type = NotificationType.MATCH_PROPOSAL
+
+        given(toastNotificationRepository.findByUserAndType(user, type)).willReturn(null)
+
+        // when
+        // then
+        assertThrows(ToastNotificationNotFoundException::class.java) {
+            notificationService.deleteToastNotification(user, type)
+        }
+
     }
 }
