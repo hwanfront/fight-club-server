@@ -2,7 +2,9 @@ package com.fightclub.fight_club_server.matchingWait.service
 
 import com.fightclub.fight_club_server.matchProposal.repository.MatchProposalRepository
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
+import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitRequest
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitResponse
+import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitAlreadyExistsException
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitNotFoundException
 import com.fightclub.fight_club_server.matchingWait.mapper.MatchingWaitMapper
 import com.fightclub.fight_club_server.matchingWait.repository.MatchingWaitRepository
@@ -18,6 +20,8 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.given
 import org.mockito.kotlin.verify
 import java.time.LocalDateTime
@@ -82,6 +86,58 @@ class MatchingWaitServiceTest {
         // then
         assertThrows(MatchingWaitNotFoundException::class.java) {
             matchingWaitService.getMyMatchingWait(user)
+        }
+    }
+
+    @Test
+    fun `# createMatchingWait success`() {
+        // given
+        val userId = 1L
+        val weight = 55.0
+        val weightClass = WeightClass.BANTAM
+        val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val request = MatchingWaitRequest(
+            weight = weight
+        )
+        val matchingWaitResponse = MatchingWaitResponse(
+            weight = weight,
+            weightClass = weightClass,
+            createdAt = LocalDateTime.of(2025, 4, 1, 12, 0)
+        )
+
+        given(matchingWaitRepository.existsByUserId(userId)).willReturn(false)
+        given(matchingWaitMapper.toResponse(any<MatchingWait>())).willReturn(matchingWaitResponse)
+
+        // when
+        val result = matchingWaitService.createMatchingWait(user, request)
+
+        // then
+        val captor = argumentCaptor<MatchingWait>()
+        verify(matchingWaitRepository).save(captor.capture())
+
+        val savedMatchingWait = captor.firstValue
+        assertThat(savedMatchingWait.user).isEqualTo(user)
+        assertThat(savedMatchingWait.weight).isEqualTo(weight)
+        assertThat(savedMatchingWait.weightClass).isEqualTo(weightClass)
+
+        assertThat(result).usingRecursiveComparison().ignoringFields("createdAt").isEqualTo(matchingWaitResponse)
+    }
+
+    @Test
+    fun `# createMatchingWait failed - 이미 존재하는 메칭 대기 MatchingWaitAlreadyExistsException`() {
+        // given
+        val userId = 1L
+        val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val request = MatchingWaitRequest(
+            weight = 55.0
+        )
+
+        given(matchingWaitRepository.existsByUserId(userId)).willReturn(true)
+
+        // when
+        // then
+        assertThrows(MatchingWaitAlreadyExistsException::class.java) {
+            matchingWaitService.createMatchingWait(user, request)
         }
     }
 }
