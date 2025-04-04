@@ -178,4 +178,60 @@ class MatchingWaitServiceTest {
 
         verify(matchingWaitRepository, never()).delete(any())
     }
+
+    @Test
+    fun `# updateMatchingWait success`() {
+        // given
+        val userId = 1L
+        val weight = 55.0
+        val weightClass = WeightClass.BANTAM
+        val updatedWeight = 50.0
+        val updatedWeightClass = WeightClass.fromWeight(updatedWeight)
+        val createdAt = LocalDateTime.of(2025, 4, 1, 12, 0)
+        val updatedCreatedAt = LocalDateTime.of(2025, 4, 1, 12, 5)
+        val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val matchingWait = MatchingWait(
+            id = 1L,
+            user = user,
+            weight = weight,
+            weightClass = weightClass,
+            createdAt = createdAt,
+        )
+        val matchingWaitRequest = MatchingWaitRequest(
+            weight = updatedWeight,
+        )
+        val matchingWaitResponse = MatchingWaitResponse(
+            weight = updatedWeight,
+            weightClass = updatedWeightClass,
+            createdAt = updatedCreatedAt
+        )
+
+        given(matchingWaitRepository.findByUser(user)).willReturn(matchingWait)
+        given(matchingWaitMapper.toResponse(matchingWait)).willReturn(matchingWaitResponse)
+
+        // when
+        val result = matchingWaitService.updateMatchingWait(user, matchingWaitRequest)
+
+        // then
+        assertThat(result.weight).isEqualTo(updatedWeight)
+        assertThat(result.weightClass).isEqualTo(updatedWeightClass)
+        assertThat(result.createdAt).isEqualTo(updatedCreatedAt)
+        verify(matchingWaitRepository).save(matchingWait)
+    }
+
+    @Test
+    fun `# updateMatchingWait failed - `() {
+        // given
+        val user = User(id = 1L, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val matchingWaitRequest = MatchingWaitRequest(
+            weight = 50.0,
+        )
+        given(matchingWaitRepository.findByUser(user)).willReturn(null)
+
+        // when
+        // then
+        assertThrows(MatchingWaitNotFoundException::class.java) {
+            matchingWaitService.updateMatchingWait(user, matchingWaitRequest)
+        }
+    }
 }
