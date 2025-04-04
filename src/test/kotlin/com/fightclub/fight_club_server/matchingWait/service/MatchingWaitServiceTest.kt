@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.mockito.Mockito.never
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -139,5 +140,42 @@ class MatchingWaitServiceTest {
         assertThrows(MatchingWaitAlreadyExistsException::class.java) {
             matchingWaitService.createMatchingWait(user, request)
         }
+    }
+
+    @Test
+    fun `# cancelMatchingWait success`() {
+        // given
+        val userId = 1L
+        val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val matchingWait = MatchingWait(
+            id = 1L,
+            user = user,
+            weight = 55.0,
+            weightClass = WeightClass.BANTAM,
+            LocalDateTime.of(2025, 4, 1, 12, 0)
+        )
+
+        given(matchingWaitRepository.findByUser(user)).willReturn(matchingWait)
+
+        // when
+        matchingWaitService.cancelMatchingWait(user)
+
+        // then
+        verify(matchingWaitRepository).delete(matchingWait)
+    }
+
+    @Test
+    fun `# cancelMatchingWait failed - 존재하지 않는 matchingWait`() {
+        // given
+        val user = User(id = 1L, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        given(matchingWaitRepository.findByUser(user)).willReturn(null)
+
+        // when
+        // then
+        assertThrows(MatchingWaitNotFoundException::class.java) {
+            matchingWaitService.cancelMatchingWait(user)
+        }
+
+        verify(matchingWaitRepository, never()).delete(any())
     }
 }
