@@ -1,11 +1,10 @@
 package com.fightclub.fight_club_server.matchingWait.service
 
+import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
+import com.fightclub.fight_club_server.matchProposal.domain.MatchProposalStatus
 import com.fightclub.fight_club_server.matchProposal.repository.MatchProposalRepository
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
-import com.fightclub.fight_club_server.matchingWait.dto.MatchingCandidateProjection
-import com.fightclub.fight_club_server.matchingWait.dto.MatchingCandidateResponse
-import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitRequest
-import com.fightclub.fight_club_server.matchingWait.dto.MatchingWaitResponse
+import com.fightclub.fight_club_server.matchingWait.dto.*
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitAlreadyExistsException
 import com.fightclub.fight_club_server.matchingWait.exception.MatchingWaitNotFoundException
 import com.fightclub.fight_club_server.matchingWait.mapper.MatchingWaitMapper
@@ -287,6 +286,93 @@ class MatchingWaitServiceTest {
         // then
         assertThrows(MatchingWaitNotFoundException::class.java) {
             matchingWaitService.getCandidateList(user)
+        }
+    }
+
+    @Test
+    fun `# sendMatchProposal success`() {
+        val userId = 1L
+        val receiverId = 2L
+
+        val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val senderWait = MatchingWait(
+            id = 1L,
+            user = user,
+            weight = 55.0,
+            weightClass = WeightClass.BANTAM,
+        )
+
+        val request = SendMatchRequest(receiverId = receiverId)
+        val receiver = User(id = receiverId, email = "test2@gmail.com", password = "encoded2", status = UserStatus.REGISTERED)
+        val receiverWait = MatchingWait(
+            id = 2L,
+            user = receiver,
+            weight = 54.0,
+            weightClass = WeightClass.BANTAM,
+        )
+        val matchProposal = senderWait.sendRequestTo(receiverWait)
+        val savedProposal = MatchProposal(
+            id = matchProposal.id,
+            sender = matchProposal.sender,
+            receiver = matchProposal.receiver,
+            status = matchProposal.status,
+            requestedAt = matchProposal.requestedAt,
+        )
+
+        given(matchingWaitRepository.findByUserId(user.id!!)).willReturn(senderWait)
+        given(matchingWaitRepository.findByUserId(receiverId)).willReturn(receiverWait)
+        given(matchProposalRepository.save(any<MatchProposal>())).willReturn(savedProposal)
+
+        // when
+        matchingWaitService.sendMatchProposal(user, request)
+
+        // then
+        val captor = argumentCaptor<MatchProposal>()
+        verify(notificationService).notifyMatchProposal(captor.capture())
+
+        val capturedProposal = captor.firstValue
+        assertThat(capturedProposal.sender).isEqualTo(user)
+        assertThat(capturedProposal.receiver).isEqualTo(receiver)
+    }
+
+    @Test
+    fun `# sendMatchProposal failed - 자신이 매칭 대기상태가 아님 MatchingWaitNotFoundException`() {
+        val userId = 1L
+        val receiverId = 2L
+
+        val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val request = SendMatchRequest(receiverId = receiverId)
+
+        given(matchingWaitRepository.findByUserId(user.id!!)).willReturn(null)
+
+        // when
+        // then
+        assertThrows(MatchingWaitNotFoundException::class.java) {
+            matchingWaitService.sendMatchProposal(user, request)
+        }
+    }
+
+    @Test
+    fun `# sendMatchProposal failed - 매칭 대기상태인 receiverId 없음 MatchingWaitNotFoundException`() {
+        val userId = 1L
+        val receiverId = 2L
+
+        val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val senderWait = MatchingWait(
+            id = 1L,
+            user = user,
+            weight = 55.0,
+            weightClass = WeightClass.BANTAM,
+        )
+        val request = SendMatchRequest(receiverId = receiverId)
+
+        given(matchingWaitRepository.findByUserId(user.id!!)).willReturn(senderWait)
+        given(matchingWaitRepository.findByUserId(receiverId)).willReturn(null)
+
+        // when
+        // then
+        assertThrows(MatchingWaitNotFoundException::class.java) {
+            matchingWaitService.sendMatchProposal(user, request)
         }
     }
 }
