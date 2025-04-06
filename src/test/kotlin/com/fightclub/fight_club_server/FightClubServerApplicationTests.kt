@@ -8,6 +8,6 @@ class FightClubServerApplicationTests {
 
 	@Test
 	fun failTest() {
-		fail("의도적으로 실패하는 테스트입니다.")
+		assertEquals(1, 2) // 실패 유도
 	}
 }
