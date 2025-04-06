@@ -37,7 +37,13 @@ jobs:
       run: ./gradlew clean build -x test
 
     - name: Run Tests
-      run: ./gradlew test --continue
+      run: ./gradlew test --continue    
+    
+    - name: Ensure test reports directory exists (on failure)
+      if: failure()
+      run: |
+        mkdir -p build/reports/tests/test
+        echo "❌ 테스트가 실패하여 HTML 리포트가 생성되지 않았습니다." > build/reports/tests/test/README.txt
       
     - name: Upload test report
       if: always()
