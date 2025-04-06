@@ -25,3 +25,18 @@ jobs:
 
     - name: Build and Test
       run: ./gradlew clean build
+      
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report
+        path: build/reports/tests/test
+
+    - name: Notify Discord on failure
+      if: failure()
+      run: |
+        curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"content\": \"🚨 테스트 실패: [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }}) @ ${{ github.ref_name }} - 커밋: ${{ github.sha }}\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
