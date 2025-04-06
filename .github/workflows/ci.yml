@@ -32,9 +32,12 @@ jobs:
 
     - name: Grant permission for gradlew
       run: chmod +x ./gradlew
+      
+    - name: Clean and Build (without tests)
+      run: ./gradlew clean build -x test
 
-    - name: Build and Test
-      run: ./gradlew clean build
+    - name: Run Tests
+      run: ./gradlew test --continue
       
     - name: Upload test report
       if: always()
