@@ -1,0 +1,27 @@
+name: CI for Dev Branch
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Grant permission for gradlew
+      run: chmod +x ./gradlew
+
+    - name: Build and Test
+      run: ./gradlew clean build
