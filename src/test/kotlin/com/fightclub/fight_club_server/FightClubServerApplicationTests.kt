@@ -6,9 +6,4 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class FightClubServerApplicationTests {	
-
-	@Test
-	fun failTest() {
-		fail("의도적으로 실패하는 테스트입니다.")
-	}
 }
