@@ -33,10 +33,17 @@ jobs:
         name: test-report
         path: build/reports/tests/test
 
-    - name: Notify Discord on failure
-      if: failure()
+    - name: Notify Discord
+      if: always()
       run: |
+        STATUS="${{ job.status }}"
+        if [ "$STATUS" = "success" ]; then
+          MESSAGE="✅ 테스트 성공: [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }}) @ ${{ github.ref_name }} - 커밋: ${{ github.sha }}"
+        else
+          MESSAGE="🚨 테스트 실패: [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }}) @ ${{ github.ref_name }} - 커밋: ${{ github.sha }}"
+        fi
+
         curl -H "Content-Type: application/json" \
           -X POST \
-          -d "{\"content\": \"🚨 테스트 실패: [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }}) @ ${{ github.ref_name }} - 커밋: ${{ github.sha }}\"}" \
+          -d "{\"content\": \"$MESSAGE\"}" \
           ${{ secrets.DISCORD_WEBHOOK_URL }}
