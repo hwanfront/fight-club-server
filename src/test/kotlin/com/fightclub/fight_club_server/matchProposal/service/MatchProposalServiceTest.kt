@@ -4,6 +4,7 @@ import com.fightclub.fight_club_server.match.repository.MatchRepository
 import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
 import com.fightclub.fight_club_server.matchProposal.domain.MatchProposalStatus
 import com.fightclub.fight_club_server.matchProposal.dto.ReceivedMatchProposalResponse
+import com.fightclub.fight_club_server.matchProposal.dto.SentMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.mapper.MatchProposalMapper
 import com.fightclub.fight_club_server.matchProposal.repository.MatchProposalRepository
 import com.fightclub.fight_club_server.meta.enums.WeightClass
@@ -112,4 +113,81 @@ class MatchProposalServiceTest {
         assertThat(result).isEmpty()
     }
 
+    @Test
+    fun `# getSentMatchProposalList success`() {
+        // given
+        val userWeight = 55.0
+        val weightClass = WeightClass.BANTAM
+        val requestedAt = LocalDateTime.of(2025, 4, 1, 12, 0)
+        val receiver1Weight = 54.5
+        val receiver2Weight = 54.0
+        val receiver1Nickname = "receiver1"
+        val receiver2Nickname = "receiver2"
+
+        val user = User(id = 1L, nickname = "user", email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val receiver1 = User(id = 2L, nickname = receiver1Nickname, email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val receiver2 = User(id = 3L, nickname = receiver2Nickname, email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val proposalList = listOf(
+            MatchProposal(
+                id = 1L,
+                sender = user,
+                senderWeight = userWeight,
+                receiver = receiver1,
+                receiverWeight = receiver1Weight,
+                weightClass = weightClass,
+                status = MatchProposalStatus.PENDING,
+                requestedAt = requestedAt
+            ),
+            MatchProposal(
+                id = 2L,
+                sender = user,
+                senderWeight = userWeight,
+                receiver = receiver2,
+                receiverWeight = receiver2Weight,
+                weightClass = weightClass,
+                status = MatchProposalStatus.PENDING,
+                requestedAt = requestedAt
+            ),
+        )
+        val mappedProposalList = listOf(
+            SentMatchProposalResponse(
+                id = 1L,
+                senderWeight = userWeight,
+                receiverWeight = receiver1Weight,
+                receiverNickname = receiver1Nickname,
+                weightClass = weightClass,
+                requestedAt = requestedAt
+            ),
+            SentMatchProposalResponse(
+                id = 2L,
+                senderWeight = userWeight,
+                receiverWeight = receiver2Weight,
+                receiverNickname = receiver2Nickname,
+                weightClass = weightClass,
+                requestedAt = requestedAt
+            ),
+        )
+
+        given(matchProposalRepository.findAllBySenderAndStatus(user, MatchProposalStatus.PENDING)).willReturn(proposalList)
+
+        // when
+        val result = matchProposalService.getSentMatchProposalList(user)
+
+        // then
+        assertThat(result).isEqualTo(mappedProposalList)
+    }
+
+    @Test
+    fun `# getSentMatchProposalList success - empty`() {
+        // given
+        val user = User(id = 1L, nickname = "user", email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+
+        given(matchProposalRepository.findAllBySenderAndStatus(user, MatchProposalStatus.PENDING)).willReturn(emptyList())
+
+        // when
+        val result = matchProposalService.getSentMatchProposalList(user)
+
+        // then
+        assertThat(result).isEmpty()
+    }
 }
