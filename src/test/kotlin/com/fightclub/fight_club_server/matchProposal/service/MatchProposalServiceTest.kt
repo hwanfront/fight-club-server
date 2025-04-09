@@ -4,6 +4,7 @@ import com.fightclub.fight_club_server.match.domain.Match
 import com.fightclub.fight_club_server.match.domain.MatchStatus
 import com.fightclub.fight_club_server.match.repository.MatchRepository
 import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
+import com.fightclub.fight_club_server.matchProposal.dto.AcceptResponse
 import com.fightclub.fight_club_server.matchProposal.dto.ReceivedMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.dto.SentMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.mapper.MatchProposalMapper
@@ -15,19 +16,22 @@ import com.fightclub.fight_club_server.user.domain.UserStatus
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
 import org.mockito.BDDMockito.given
 import org.mockito.Mock
+import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import java.time.LocalDateTime
 import java.util.*
 
+@ExtendWith(MockitoExtension::class)
 class MatchProposalServiceTest {
     @Mock lateinit var matchProposalRepository: MatchProposalRepository
     @Mock lateinit var matchRepository: MatchRepository
-    @Mock lateinit var matchProposalMapper: MatchProposalMapper
     @Mock lateinit var notificationService: NotificationService
+    private val matchProposalMapper = MatchProposalMapper()
 
     private lateinit var matchProposalService: MatchProposalService
 
@@ -189,5 +193,52 @@ class MatchProposalServiceTest {
 
         // then
         assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun `# acceptProposal success`() {
+        // given
+        val matchProposalId = 1L
+        val senderWeight = 54.0
+        val receiverWeight = 55.0
+        val weightClass = WeightClass.BANTAM
+        val matchId = 1L
+
+        val receiver = User(id = 1L, nickname = "receiver", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val sender = User(id = 2L, nickname = "sender", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val matchProposal = MatchProposal(
+            id = 1L,
+            sender = sender,
+            senderWeight = senderWeight,
+            receiver = receiver,
+            receiverWeight = receiverWeight,
+            weightClass = weightClass,
+        )
+
+        val match = Match(
+            id = matchId,
+            user1 = receiver,
+            user2 = sender,
+            status = MatchStatus.CHATTING,
+            weightClass = weightClass,
+            user1Weight = receiverWeight,
+            user2Weight = senderWeight,
+        )
+
+        val acceptResponse = AcceptResponse(
+            matchId = matchId
+        )
+
+        given(matchProposalRepository.findById(matchProposalId)).willReturn(Optional.of(matchProposal))
+        given(matchRepository.save(any())).willReturn(match)
+
+        // when
+        val result = matchProposalService.acceptProposal(matchProposalId, receiver)
+
+        // then
+        verify(matchProposalRepository).delete(matchProposal)
+        verify(matchRepository).save(any())
+
+        assertThat(result.matchId).isEqualTo(matchId)
     }
 }
