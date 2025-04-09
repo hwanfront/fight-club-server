@@ -293,13 +293,14 @@ class MatchingWaitServiceTest {
     fun `# sendMatchProposal success`() {
         val userId = 1L
         val receiverId = 2L
+        val weightClass = WeightClass.BANTAM
 
         val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val senderWait = MatchingWait(
             id = 1L,
             user = user,
             weight = 55.0,
-            weightClass = WeightClass.BANTAM,
+            weightClass = weightClass,
         )
 
         val request = SendMatchRequest(receiverId = receiverId)
@@ -308,13 +309,16 @@ class MatchingWaitServiceTest {
             id = 2L,
             user = receiver,
             weight = 54.0,
-            weightClass = WeightClass.BANTAM,
+            weightClass = weightClass,
         )
-        val matchProposal = senderWait.sendRequestTo(receiverWait)
+        val matchProposal = matchingWaitMapper.toMatchProposal(senderWait, receiverWait)
         val savedProposal = MatchProposal(
             id = matchProposal.id,
             sender = matchProposal.sender,
             receiver = matchProposal.receiver,
+            senderWeight = matchProposal.senderWeight,
+            receiverWeight = matchProposal.receiverWeight,
+            weightClass = matchProposal.weightClass,
             status = matchProposal.status,
             requestedAt = matchProposal.requestedAt,
         )

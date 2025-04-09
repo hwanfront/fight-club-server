@@ -81,7 +81,7 @@ class MatchingWaitService(
     fun sendMatchProposal(user: User, request: SendMatchRequest) {
         val senderWait = matchingWaitRepository.findByUserId(user.id!!) ?: throw MatchingWaitNotFoundException()
         val receiverWait = matchingWaitRepository.findByUserId(request.receiverId) ?: throw MatchingWaitNotFoundException()
-        val matchProposal = senderWait.sendRequestTo(receiverWait)
+        val matchProposal = matchingWaitMapper.toMatchProposal(senderWait, receiverWait)
 
         val savedMatchProposal = matchProposalRepository.save(matchProposal)
         notificationService.notifyMatchProposal(savedMatchProposal)
