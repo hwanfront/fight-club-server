@@ -21,13 +21,11 @@ class MatchProposal(
     val receiver: User,
 
     var senderWeight: Double,
+
     var receiverWeight: Double,
 
     @Enumerated(EnumType.STRING)
     var weightClass: WeightClass,
-
-    @Enumerated(EnumType.STRING)
-    var status: MatchProposalStatus = MatchProposalStatus.PENDING,
 
     val requestedAt: LocalDateTime = LocalDateTime.now()
 ) {

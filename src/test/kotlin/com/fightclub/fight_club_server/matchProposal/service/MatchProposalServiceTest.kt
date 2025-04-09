@@ -1,8 +1,9 @@
 package com.fightclub.fight_club_server.matchProposal.service
 
+import com.fightclub.fight_club_server.match.domain.Match
+import com.fightclub.fight_club_server.match.domain.MatchStatus
 import com.fightclub.fight_club_server.match.repository.MatchRepository
 import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
-import com.fightclub.fight_club_server.matchProposal.domain.MatchProposalStatus
 import com.fightclub.fight_club_server.matchProposal.dto.ReceivedMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.dto.SentMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.mapper.MatchProposalMapper
@@ -17,7 +18,10 @@ import org.junit.jupiter.api.Test
 
 import org.mockito.BDDMockito.given
 import org.mockito.Mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import java.time.LocalDateTime
+import java.util.*
 
 class MatchProposalServiceTest {
     @Mock lateinit var matchProposalRepository: MatchProposalRepository
@@ -59,7 +63,6 @@ class MatchProposalServiceTest {
                 receiver = user,
                 receiverWeight = userWeight,
                 weightClass = weightClass,
-                status = MatchProposalStatus.PENDING,
                 requestedAt = requestedAt
             ),
             MatchProposal(
@@ -69,7 +72,6 @@ class MatchProposalServiceTest {
                 receiver = user,
                 receiverWeight = userWeight,
                 weightClass = weightClass,
-                status = MatchProposalStatus.PENDING,
                 requestedAt = requestedAt
             ),
         )
@@ -90,7 +92,7 @@ class MatchProposalServiceTest {
             ),
         )
 
-        given(matchProposalRepository.findAllByReceiverAndStatus(user, MatchProposalStatus.PENDING)).willReturn(proposalList)
+        given(matchProposalRepository.findAllByReceiver(user)).willReturn(proposalList)
 
         // when
         val result = matchProposalService.getReceivedMatchProposalList(user)
@@ -104,7 +106,7 @@ class MatchProposalServiceTest {
         // given
         val user = User(id = 1L, nickname = "user", email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
 
-        given(matchProposalRepository.findAllByReceiverAndStatus(user, MatchProposalStatus.PENDING)).willReturn(emptyList())
+        given(matchProposalRepository.findAllByReceiver(user)).willReturn(emptyList())
 
         // when
         val result = matchProposalService.getReceivedMatchProposalList(user)
@@ -135,7 +137,6 @@ class MatchProposalServiceTest {
                 receiver = receiver1,
                 receiverWeight = receiver1Weight,
                 weightClass = weightClass,
-                status = MatchProposalStatus.PENDING,
                 requestedAt = requestedAt
             ),
             MatchProposal(
@@ -145,7 +146,6 @@ class MatchProposalServiceTest {
                 receiver = receiver2,
                 receiverWeight = receiver2Weight,
                 weightClass = weightClass,
-                status = MatchProposalStatus.PENDING,
                 requestedAt = requestedAt
             ),
         )
@@ -168,7 +168,7 @@ class MatchProposalServiceTest {
             ),
         )
 
-        given(matchProposalRepository.findAllBySenderAndStatus(user, MatchProposalStatus.PENDING)).willReturn(proposalList)
+        given(matchProposalRepository.findAllBySender(user)).willReturn(proposalList)
 
         // when
         val result = matchProposalService.getSentMatchProposalList(user)
@@ -182,7 +182,7 @@ class MatchProposalServiceTest {
         // given
         val user = User(id = 1L, nickname = "user", email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
 
-        given(matchProposalRepository.findAllBySenderAndStatus(user, MatchProposalStatus.PENDING)).willReturn(emptyList())
+        given(matchProposalRepository.findAllBySender(user)).willReturn(emptyList())
 
         // when
         val result = matchProposalService.getSentMatchProposalList(user)

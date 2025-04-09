@@ -1,7 +1,6 @@
 package com.fightclub.fight_club_server.matchingWait.service
 
 import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
-import com.fightclub.fight_club_server.matchProposal.domain.MatchProposalStatus
 import com.fightclub.fight_club_server.matchProposal.repository.MatchProposalRepository
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
 import com.fightclub.fight_club_server.matchingWait.dto.*
@@ -23,10 +22,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.any
-import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.given
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.*
 import java.time.LocalDateTime
 
 @ExtendWith(MockitoExtension::class)
@@ -294,49 +290,53 @@ class MatchingWaitServiceTest {
         val userId = 1L
         val receiverId = 2L
         val weightClass = WeightClass.BANTAM
+        val userWeight = 55.0
+        val receiverWeight = 54.0
 
         val user = User(id = userId, email = "test@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val senderWait = MatchingWait(
             id = 1L,
             user = user,
-            weight = 55.0,
+            weight = userWeight,
             weightClass = weightClass,
         )
 
-        val request = SendMatchRequest(receiverId = receiverId)
         val receiver = User(id = receiverId, email = "test2@gmail.com", password = "encoded2", status = UserStatus.REGISTERED)
         val receiverWait = MatchingWait(
             id = 2L,
             user = receiver,
-            weight = 54.0,
+            weight = receiverWeight,
             weightClass = weightClass,
         )
-        val matchProposal = matchingWaitMapper.toMatchProposal(senderWait, receiverWait)
-        val savedProposal = MatchProposal(
-            id = matchProposal.id,
-            sender = matchProposal.sender,
-            receiver = matchProposal.receiver,
-            senderWeight = matchProposal.senderWeight,
-            receiverWeight = matchProposal.receiverWeight,
-            weightClass = matchProposal.weightClass,
-            status = matchProposal.status,
-            requestedAt = matchProposal.requestedAt,
+        val request = SendMatchRequest(receiverId = receiverId)
+        val matchProposal = MatchProposal(
+            id = 1L,
+            sender = user,
+            receiver = receiver,
+            senderWeight = userWeight,
+            receiverWeight = receiverWeight,
+            weightClass = weightClass,
         )
 
         given(matchingWaitRepository.findByUserId(user.id!!)).willReturn(senderWait)
         given(matchingWaitRepository.findByUserId(receiverId)).willReturn(receiverWait)
-        given(matchProposalRepository.save(any<MatchProposal>())).willReturn(savedProposal)
+        given(matchingWaitMapper.toMatchProposal(senderWait, receiverWait)).willReturn(matchProposal)
+        given(matchProposalRepository.save(matchProposal)).willReturn(matchProposal)
+//        doReturn(matchProposal).`when`(matchProposalRepository).save(any())
 
         // when
         matchingWaitService.sendMatchProposal(user, request)
 
         // then
+        verify(matchProposalRepository).save(matchProposal)
         val captor = argumentCaptor<MatchProposal>()
         verify(notificationService).notifyMatchProposal(captor.capture())
 
         val capturedProposal = captor.firstValue
         assertThat(capturedProposal.sender).isEqualTo(user)
         assertThat(capturedProposal.receiver).isEqualTo(receiver)
+        assertThat(capturedProposal.senderWeight).isEqualTo(senderWait.weight)
+        assertThat(capturedProposal.weightClass).isEqualTo(senderWait.weightClass)
     }
 
     @Test
