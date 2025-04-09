@@ -1,7 +1,7 @@
 package com.fightclub.fight_club_server.matchProposal.service
 
-import com.fightclub.fight_club_server.match.domain.Match
 import com.fightclub.fight_club_server.match.repository.MatchRepository
+import com.fightclub.fight_club_server.matchProposal.dto.AcceptResponse
 import com.fightclub.fight_club_server.matchProposal.dto.ReceivedMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.dto.SentMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.mapper.MatchProposalMapper
@@ -26,12 +26,9 @@ class MatchProposalService(
         return listOf()
     }
 
-    fun acceptProposal(matchProposalId: Long, user: User): Match {
-        return Match(
-            user1 = TODO(),
-            user2 = TODO(),
-            status = TODO(),
-            matchedAt = TODO(),
+    fun acceptProposal(matchProposalId: Long, user: User): AcceptResponse {
+        return AcceptResponse(
+            matchId = 1L
         )
     }
 

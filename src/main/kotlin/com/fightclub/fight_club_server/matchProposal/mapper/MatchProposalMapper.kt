@@ -3,6 +3,7 @@ package com.fightclub.fight_club_server.matchProposal.mapper
 import com.fightclub.fight_club_server.match.domain.Match
 import com.fightclub.fight_club_server.match.domain.MatchStatus
 import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
+import com.fightclub.fight_club_server.matchProposal.dto.AcceptResponse
 import com.fightclub.fight_club_server.matchProposal.dto.ReceivedMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.dto.SentMatchProposalResponse
 import org.springframework.stereotype.Component
@@ -34,7 +35,16 @@ class MatchProposalMapper {
         return Match(
             user1 = matchProposal.receiver,
             user2 = matchProposal.sender,
+            user1Weight = matchProposal.receiverWeight,
+            user2Weight = matchProposal.senderWeight,
+            weightClass = matchProposal.weightClass,
             status = MatchStatus.CHATTING,
+        )
+    }
+
+    fun toAcceptResponse(match: Match): AcceptResponse {
+        return AcceptResponse(
+            matchId = match.id
         )
     }
 }
