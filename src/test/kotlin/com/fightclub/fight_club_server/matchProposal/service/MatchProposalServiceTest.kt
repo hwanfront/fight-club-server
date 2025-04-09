@@ -204,20 +204,20 @@ class MatchProposalServiceTest {
         val weightClass = WeightClass.BANTAM
         val matchId = 1L
 
-        val receiver = User(id = 1L, nickname = "receiver", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val user = User(id = 1L, nickname = "receiver", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val sender = User(id = 2L, nickname = "sender", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val matchProposal = MatchProposal(
             id = matchProposalId,
             sender = sender,
             senderWeight = senderWeight,
-            receiver = receiver,
+            receiver = user,
             receiverWeight = receiverWeight,
             weightClass = weightClass,
         )
 
         val match = Match(
             id = matchId,
-            user1 = receiver,
+            user1 = user,
             user2 = sender,
             status = MatchStatus.CHATTING,
             weightClass = weightClass,
@@ -233,7 +233,7 @@ class MatchProposalServiceTest {
         given(matchRepository.save(any())).willReturn(match)
 
         // when
-        val result = matchProposalService.acceptProposal(matchProposalId, receiver)
+        val result = matchProposalService.acceptProposal(matchProposalId, user)
 
         // then
         verify(matchProposalRepository).delete(matchProposal)
@@ -246,25 +246,47 @@ class MatchProposalServiceTest {
     fun rejectProposal() {
         // given
         val matchProposalId = 1L
-        val senderWeight = 54.0
-        val receiverWeight = 55.0
-        val weightClass = WeightClass.BANTAM
 
-        val receiver = User(id = 1L, nickname = "receiver", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val user = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val sender = User(id = 2L, nickname = "sender", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val matchProposal = MatchProposal(
             id = matchProposalId,
             sender = sender,
-            senderWeight = senderWeight,
-            receiver = receiver,
-            receiverWeight = receiverWeight,
-            weightClass = weightClass,
+            senderWeight = 54.0,
+            receiver = user,
+            receiverWeight = 55.0,
+            weightClass = WeightClass.BANTAM,
         )
 
         given(matchProposalRepository.findById(matchProposalId)).willReturn(Optional.of(matchProposal))
 
         // when
-        matchProposalService.rejectProposal(matchProposalId, receiver)
+        matchProposalService.rejectProposal(matchProposalId, user)
+
+        // then
+        verify(matchProposalRepository).delete(matchProposal)
+    }
+
+    @Test
+    fun cancelMyProposal() {
+        // given
+        val matchProposalId = 1L
+
+        val receiver = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val user = User(id = 2L, nickname = "sender", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val matchProposal = MatchProposal(
+            id = matchProposalId,
+            sender = user,
+            senderWeight = 54.0,
+            receiver = receiver,
+            receiverWeight = 55.0,
+            weightClass = WeightClass.BANTAM,
+        )
+
+        given(matchProposalRepository.findById(matchProposalId)).willReturn(Optional.of(matchProposal))
+
+        // when
+        matchProposalService.rejectProposal(matchProposalId, user)
 
         // then
         verify(matchProposalRepository).delete(matchProposal)
