@@ -22,9 +22,9 @@ class MatchProposalMapper {
     fun toSentMatchProposalResponse(matchProposal: MatchProposal): SentMatchProposalResponse {
         return SentMatchProposalResponse(
             id = matchProposal.id,
-            senderNickname = matchProposal.sender.nickname,
             senderWeight = matchProposal.senderWeight,
             receiverWeight = matchProposal.receiverWeight,
+            receiverNickname = matchProposal.receiver.nickname,
             weightClass = matchProposal.weightClass,
             requestedAt = matchProposal.requestedAt,
         )
