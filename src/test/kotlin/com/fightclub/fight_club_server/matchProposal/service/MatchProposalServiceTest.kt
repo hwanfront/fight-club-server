@@ -207,7 +207,7 @@ class MatchProposalServiceTest {
         val receiver = User(id = 1L, nickname = "receiver", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val sender = User(id = 2L, nickname = "sender", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val matchProposal = MatchProposal(
-            id = 1L,
+            id = matchProposalId,
             sender = sender,
             senderWeight = senderWeight,
             receiver = receiver,
@@ -240,5 +240,33 @@ class MatchProposalServiceTest {
         verify(matchRepository).save(any())
 
         assertThat(result.matchId).isEqualTo(matchId)
+    }
+
+    @Test
+    fun rejectProposal() {
+        // given
+        val matchProposalId = 1L
+        val senderWeight = 54.0
+        val receiverWeight = 55.0
+        val weightClass = WeightClass.BANTAM
+
+        val receiver = User(id = 1L, nickname = "receiver", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val sender = User(id = 2L, nickname = "sender", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val matchProposal = MatchProposal(
+            id = matchProposalId,
+            sender = sender,
+            senderWeight = senderWeight,
+            receiver = receiver,
+            receiverWeight = receiverWeight,
+            weightClass = weightClass,
+        )
+
+        given(matchProposalRepository.findById(matchProposalId)).willReturn(Optional.of(matchProposal))
+
+        // when
+        matchProposalService.rejectProposal(matchProposalId, receiver)
+
+        // then
+        verify(matchProposalRepository).delete(matchProposal)
     }
 }
