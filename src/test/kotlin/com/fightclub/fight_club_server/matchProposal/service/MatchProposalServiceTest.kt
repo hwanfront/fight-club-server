@@ -26,6 +26,7 @@ import org.mockito.BDDMockito.given
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.verify
 import java.time.LocalDateTime
 import java.util.*
@@ -244,6 +245,15 @@ class MatchProposalServiceTest {
         verify(matchRepository).save(any())
 
         assertThat(result.matchId).isEqualTo(matchId)
+
+        val captor = argumentCaptor<MatchProposal>()
+        verify(notificationService).notifyMatchAccepted(captor.capture())
+
+        val capturedProposal = captor.firstValue
+        assertThat(capturedProposal.sender).isEqualTo(sender)
+        assertThat(capturedProposal.receiver).isEqualTo(user)
+        assertThat(capturedProposal.senderWeight).isEqualTo(senderWeight)
+        assertThat(capturedProposal.weightClass).isEqualTo(weightClass)
     }
 
     @Test
@@ -360,16 +370,19 @@ class MatchProposalServiceTest {
     fun `# cancelMyProposal success`() {
         // given
         val matchProposalId = 1L
+        val senderWeight = 54.0
+        val receiverWeight = 55.0
+        val weightClass = WeightClass.BANTAM
 
         val user = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val receiver = User(id = 2L, nickname = "receiver", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val matchProposal = MatchProposal(
             id = matchProposalId,
             sender = user,
-            senderWeight = 54.0,
+            senderWeight = senderWeight,
             receiver = receiver,
-            receiverWeight = 55.0,
-            weightClass = WeightClass.BANTAM,
+            receiverWeight = receiverWeight,
+            weightClass = weightClass,
         )
 
         given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.of(matchProposal))
@@ -379,6 +392,14 @@ class MatchProposalServiceTest {
 
         // then
         verify(matchProposalRepository).delete(matchProposal)
+        val captor = argumentCaptor<MatchProposal>()
+        verify(notificationService).notifyMatchProposalCanceled(captor.capture())
+
+        val capturedProposal = captor.firstValue
+        assertThat(capturedProposal.sender).isEqualTo(user)
+        assertThat(capturedProposal.receiver).isEqualTo(receiver)
+        assertThat(capturedProposal.senderWeight).isEqualTo(senderWeight)
+        assertThat(capturedProposal.weightClass).isEqualTo(weightClass)
     }
 
     @Test
