@@ -243,7 +243,7 @@ class MatchProposalServiceTest {
     }
 
     @Test
-    fun rejectProposal() {
+    fun `# rejectProposal success`() {
         // given
         val matchProposalId = 1L
 
@@ -268,7 +268,7 @@ class MatchProposalServiceTest {
     }
 
     @Test
-    fun cancelMyProposal() {
+    fun `# cancelMyProposal success`() {
         // given
         val matchProposalId = 1L
 
@@ -286,7 +286,7 @@ class MatchProposalServiceTest {
         given(matchProposalRepository.findById(matchProposalId)).willReturn(Optional.of(matchProposal))
 
         // when
-        matchProposalService.rejectProposal(matchProposalId, user)
+        matchProposalService.cancelMyProposal(matchProposalId, user)
 
         // then
         verify(matchProposalRepository).delete(matchProposal)
