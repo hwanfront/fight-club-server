@@ -37,7 +37,7 @@ class MatchProposalService(
         val matchProposal = matchProposalRepository.findByIdWithLock(matchProposalId)
             .orElseThrow { MatchProposalNotFoundException() }
 
-        if(matchProposal.receiver != user) {
+        if(matchProposal.receiver.id != user.id) {
             throw UserIsNotReceiverException()
         }
 
@@ -53,7 +53,7 @@ class MatchProposalService(
         val matchProposal = matchProposalRepository.findByIdWithLock(matchProposalId)
             .orElseThrow { MatchProposalNotFoundException() }
 
-        if(matchProposal.receiver != user) {
+        if(matchProposal.receiver.id != user.id) {
             throw UserIsNotReceiverException()
         }
 
@@ -65,7 +65,7 @@ class MatchProposalService(
         val matchProposal = matchProposalRepository.findByIdWithLock(matchProposalId)
             .orElseThrow { MatchProposalNotFoundException() }
 
-        if(matchProposal.sender != user) {
+        if(matchProposal.sender.id != user.id) {
             throw UserIsNotSenderException()
         }
 
