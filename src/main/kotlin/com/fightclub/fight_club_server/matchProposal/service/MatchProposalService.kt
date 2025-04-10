@@ -44,6 +44,7 @@ class MatchProposalService(
         val match = matchRepository.save(matchProposalMapper.toMatch(matchProposal))
 
         matchProposalRepository.delete(matchProposal)
+        notificationService.notifyMatchAccepted(matchProposal)
 
         return matchProposalMapper.toAcceptResponse(match)
     }
@@ -70,5 +71,6 @@ class MatchProposalService(
         }
 
         matchProposalRepository.delete(matchProposal)
+        notificationService.notifyMatchProposalCanceled(matchProposal)
     }
 }
