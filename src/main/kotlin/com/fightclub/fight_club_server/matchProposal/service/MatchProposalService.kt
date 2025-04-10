@@ -34,26 +34,41 @@ class MatchProposalService(
 
     @Transactional
     fun acceptProposal(matchProposalId: Long, user: User): AcceptResponse {
-        return AcceptResponse(
-            matchId = 1L
-        )
-    }
-
-    fun rejectProposal(matchProposalId: Long, user: User): Unit {
-        val matchProposal = matchProposalRepository.findById(matchProposalId)
+        val matchProposal = matchProposalRepository.findByIdWithLock(matchProposalId)
             .orElseThrow { MatchProposalNotFoundException() }
+
         if(matchProposal.receiver != user) {
             throw UserIsNotReceiverException()
         }
+
+        val match = matchRepository.save(matchProposalMapper.toMatch(matchProposal))
+
+        matchProposalRepository.delete(matchProposal)
+
+        return matchProposalMapper.toAcceptResponse(match)
+    }
+
+    @Transactional
+    fun rejectProposal(matchProposalId: Long, user: User): Unit {
+        val matchProposal = matchProposalRepository.findByIdWithLock(matchProposalId)
+            .orElseThrow { MatchProposalNotFoundException() }
+
+        if(matchProposal.receiver != user) {
+            throw UserIsNotReceiverException()
+        }
+
         matchProposalRepository.delete(matchProposal)
     }
 
+    @Transactional
     fun cancelMyProposal(matchProposalId: Long, user: User): Unit {
-        val matchProposal = matchProposalRepository.findById(matchProposalId)
+        val matchProposal = matchProposalRepository.findByIdWithLock(matchProposalId)
             .orElseThrow { MatchProposalNotFoundException() }
+
         if(matchProposal.sender != user) {
             throw UserIsNotSenderException()
         }
+
         matchProposalRepository.delete(matchProposal)
     }
 }
