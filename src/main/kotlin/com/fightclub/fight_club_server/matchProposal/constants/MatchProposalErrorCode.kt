@@ -10,4 +10,5 @@ enum class MatchProposalErrorCode(
 ): ResponseCode {
     MATCH_PROPOSAL_NOT_FOUND(HttpStatus.NOT_FOUND, MatchProposalConstants.MatchProposalNotFound.CODE, MatchProposalConstants.MatchProposalNotFound.MESSAGE),
     USER_IS_NOT_RECEIVER(HttpStatus.FORBIDDEN, MatchProposalConstants.UserIsNotReceiver.MESSAGE, MatchProposalConstants.UserIsNotReceiver.MESSAGE),
+    USER_IS_NOT_SENDER(HttpStatus.FORBIDDEN, MatchProposalConstants.UserIsNotSender.MESSAGE, MatchProposalConstants.UserIsNotSender.MESSAGE),
 }

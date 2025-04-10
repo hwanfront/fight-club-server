@@ -5,3 +5,4 @@ import com.fightclub.fight_club_server.matchProposal.constants.MatchProposalErro
 
 class MatchProposalNotFoundException: BaseException(MatchProposalErrorCode.MATCH_PROPOSAL_NOT_FOUND)
 class UserIsNotReceiverException: BaseException(MatchProposalErrorCode.USER_IS_NOT_RECEIVER)
+class UserIsNotSenderException: BaseException(MatchProposalErrorCode.USER_IS_NOT_SENDER)

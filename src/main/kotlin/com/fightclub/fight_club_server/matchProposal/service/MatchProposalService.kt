@@ -6,6 +6,7 @@ import com.fightclub.fight_club_server.matchProposal.dto.ReceivedMatchProposalRe
 import com.fightclub.fight_club_server.matchProposal.dto.SentMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.exception.MatchProposalNotFoundException
 import com.fightclub.fight_club_server.matchProposal.exception.UserIsNotReceiverException
+import com.fightclub.fight_club_server.matchProposal.exception.UserIsNotSenderException
 import com.fightclub.fight_club_server.matchProposal.mapper.MatchProposalMapper
 import com.fightclub.fight_club_server.matchProposal.repository.MatchProposalRepository
 import com.fightclub.fight_club_server.notification.service.NotificationService
@@ -48,6 +49,11 @@ class MatchProposalService(
     }
 
     fun cancelMyProposal(matchProposalId: Long, user: User): Unit {
-
+        val matchProposal = matchProposalRepository.findById(matchProposalId)
+            .orElseThrow { MatchProposalNotFoundException() }
+        if(matchProposal.sender != user) {
+            throw UserIsNotSenderException()
+        }
+        matchProposalRepository.delete(matchProposal)
     }
 }

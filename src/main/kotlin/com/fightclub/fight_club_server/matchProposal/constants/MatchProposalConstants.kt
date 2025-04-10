@@ -41,6 +41,11 @@ object MatchProposalConstants {
         const val STATUS_CODE = "403"
         const val CODE = "MPE002"
         const val MESSAGE = "해당 매치 요청의 수신자가 아닙니다."
+    }
 
+    object UserIsNotSender {
+        const val STATUS_CODE = "403"
+        const val CODE = "MPE003"
+        const val MESSAGE = "해당 매치 요청의 송신자가 아닙니다."
     }
 }
