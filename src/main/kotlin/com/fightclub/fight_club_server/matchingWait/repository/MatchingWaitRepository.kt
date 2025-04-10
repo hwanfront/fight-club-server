@@ -27,7 +27,6 @@ interface MatchingWaitRepository: JpaRepository<MatchingWait, Long> {
                     SELECT 1 FROM match_proposal mp
                     WHERE mp.sender_id = :userId
                     AND mp.receiver_id = mw.user_id
-                    AND mp.status = 'PENDING'
                 )
             ORDER BY RAND()
             LIMIT :limit
