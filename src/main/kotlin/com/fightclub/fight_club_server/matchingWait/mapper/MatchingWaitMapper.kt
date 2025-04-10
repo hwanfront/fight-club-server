@@ -1,5 +1,6 @@
 package com.fightclub.fight_club_server.matchingWait.mapper
 
+import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingCandidateProjection
 import com.fightclub.fight_club_server.matchingWait.dto.MatchingCandidateResponse
@@ -23,6 +24,16 @@ class MatchingWaitMapper {
             nickname = candidateProjection.getNickname(),
             weight = candidateProjection.getWeight(),
             weightClass = WeightClass.fromName(candidateProjection.getWeightClass()),
+        )
+    }
+
+    fun toMatchProposal(sender: MatchingWait, receiver: MatchingWait): MatchProposal {
+        return MatchProposal(
+            sender = sender.user,
+            receiver = receiver.user,
+            senderWeight = sender.weight,
+            receiverWeight = receiver.weight,
+            weightClass = sender.weightClass,
         )
     }
 }

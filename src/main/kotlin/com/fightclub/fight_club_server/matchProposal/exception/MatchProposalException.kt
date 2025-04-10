@@ -1,0 +1,8 @@
+package com.fightclub.fight_club_server.matchProposal.exception
+
+import com.fightclub.fight_club_server.common.exception.BaseException
+import com.fightclub.fight_club_server.matchProposal.constants.MatchProposalErrorCode
+
+class MatchProposalNotFoundException: BaseException(MatchProposalErrorCode.MATCH_PROPOSAL_NOT_FOUND)
+class UserIsNotReceiverException: BaseException(MatchProposalErrorCode.USER_IS_NOT_RECEIVER)
+class UserIsNotSenderException: BaseException(MatchProposalErrorCode.USER_IS_NOT_SENDER)

@@ -28,11 +28,4 @@ class MatchingWait (
         this.weightClass = weightClass
         this.createdAt = LocalDateTime.now()
     }
-
-    fun sendRequestTo(other: MatchingWait): MatchProposal {
-        return MatchProposal(
-            sender = this.user,
-            receiver = other.user
-        )
-    }
 }

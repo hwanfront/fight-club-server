@@ -1,6 +1,7 @@
 package com.fightclub.fight_club_server.notification.service
 
 import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
+import com.fightclub.fight_club_server.meta.enums.WeightClass
 import com.fightclub.fight_club_server.notification.domain.Notification
 import com.fightclub.fight_club_server.notification.domain.NotificationType
 import com.fightclub.fight_club_server.notification.domain.ToastNotification
@@ -52,7 +53,10 @@ class NotificationServiceTest {
         val matchProposal = MatchProposal(
             id = 1L,
             sender = sender,
+            senderWeight = 55.0,
             receiver = receiver,
+            receiverWeight = 54.0,
+            weightClass = WeightClass.BANTAM
         )
 
         given(toastNotificationRepository.findByUserAndType(receiver, NotificationType.MATCH_PROPOSAL)).willReturn(null)
@@ -90,7 +94,10 @@ class NotificationServiceTest {
         val matchProposal = MatchProposal(
             id = 1L,
             sender = sender,
+            senderWeight = 55.0,
             receiver = receiver,
+            receiverWeight = 54.0,
+            weightClass = WeightClass.BANTAM
         )
 
         val existsToastNotification = ToastNotification(

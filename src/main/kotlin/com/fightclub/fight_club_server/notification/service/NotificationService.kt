@@ -23,6 +23,15 @@ class NotificationService(
     private val toastNotificationRepository: ToastNotificationRepository,
     private val toastNotificationMapper: ToastNotificationMapper
 ) {
+    fun notifyMatchAccepted(matchProposal: MatchProposal) {
+        sendToast(matchProposal.sender, NotificationType.MATCH_ACCEPTED, "스파링 제안이 수락되었습니다.")
+        saveDetail(matchProposal.sender, NotificationType.MATCH_ACCEPTED, "${matchProposal.receiver.nickname} 님이 스파링 제안을 수락하였습니다.")
+    }
+
+    fun notifyMatchProposalCanceled(matchProposal: MatchProposal) {
+        sendToast(matchProposal.receiver, NotificationType.MATCH_PROPOSAL_CANCELLED, "스파링 제안이 취소되었습니다.")
+        saveDetail(matchProposal.receiver, NotificationType.MATCH_PROPOSAL_CANCELLED, "${matchProposal.sender.nickname} 님의 스파링 제안이 취소되었습니다.")
+    }
 
     fun notifyMatchProposal(matchProposal: MatchProposal) {
         sendToast(matchProposal.receiver, NotificationType.MATCH_PROPOSAL, "스파링 제안이 도착했습니다.")
