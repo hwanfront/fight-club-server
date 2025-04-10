@@ -7,6 +7,9 @@ import com.fightclub.fight_club_server.matchProposal.domain.MatchProposal
 import com.fightclub.fight_club_server.matchProposal.dto.AcceptResponse
 import com.fightclub.fight_club_server.matchProposal.dto.ReceivedMatchProposalResponse
 import com.fightclub.fight_club_server.matchProposal.dto.SentMatchProposalResponse
+import com.fightclub.fight_club_server.matchProposal.exception.MatchProposalNotFoundException
+import com.fightclub.fight_club_server.matchProposal.exception.UserIsNotReceiverException
+import com.fightclub.fight_club_server.matchProposal.exception.UserIsNotSenderException
 import com.fightclub.fight_club_server.matchProposal.mapper.MatchProposalMapper
 import com.fightclub.fight_club_server.matchProposal.repository.MatchProposalRepository
 import com.fightclub.fight_club_server.meta.enums.WeightClass
@@ -14,6 +17,7 @@ import com.fightclub.fight_club_server.notification.service.NotificationService
 import com.fightclub.fight_club_server.user.domain.User
 import com.fightclub.fight_club_server.user.domain.UserStatus
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -229,7 +233,7 @@ class MatchProposalServiceTest {
             matchId = matchId
         )
 
-        given(matchProposalRepository.findById(matchProposalId)).willReturn(Optional.of(matchProposal))
+        given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.of(matchProposal))
         given(matchRepository.save(any())).willReturn(match)
 
         // when
@@ -240,6 +244,48 @@ class MatchProposalServiceTest {
         verify(matchRepository).save(any())
 
         assertThat(result.matchId).isEqualTo(matchId)
+    }
+
+    @Test
+    fun `# acceptProposal failed - 사용자가 수신자 receiver 가 아님 UserIsNotReceiverException`() {
+        // given
+        val matchProposalId = 1L
+
+        val user = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val sender = User(id = 2L, nickname = "sender", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val receiver = User(id = 3L, nickname = "receiver", email = "test3@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+
+        val matchProposal = MatchProposal(
+            id = matchProposalId,
+            sender = sender,
+            senderWeight = 54.0,
+            receiver = receiver,
+            receiverWeight = 55.0,
+            weightClass = WeightClass.BANTAM,
+        )
+
+        given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.of(matchProposal))
+
+        // when
+        // then
+        assertThrows(UserIsNotReceiverException::class.java) {
+            matchProposalService.acceptProposal(matchProposalId, user)
+        }
+    }
+
+    @Test
+    fun `# acceptProposal failed - matchProposal 찾을 수 없음 MatchProposalNotFoundException`() {
+        // given
+        val matchProposalId = 1L
+        val user = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+
+        given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.empty())
+
+        // when
+        // then
+        assertThrows(MatchProposalNotFoundException::class.java) {
+            matchProposalService.acceptProposal(matchProposalId, user)
+        }
     }
 
     @Test
@@ -258,7 +304,7 @@ class MatchProposalServiceTest {
             weightClass = WeightClass.BANTAM,
         )
 
-        given(matchProposalRepository.findById(matchProposalId)).willReturn(Optional.of(matchProposal))
+        given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.of(matchProposal))
 
         // when
         matchProposalService.rejectProposal(matchProposalId, user)
@@ -268,12 +314,55 @@ class MatchProposalServiceTest {
     }
 
     @Test
+    fun `# rejectProposal failed - 사용자가 수신자 receiver 가 아님 UserIsNotReceiverException`() {
+        // given
+        val matchProposalId = 1L
+
+        val user = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val sender = User(id = 2L, nickname = "sender", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val receiver = User(id = 3L, nickname = "receiver", email = "test3@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+
+        val matchProposal = MatchProposal(
+            id = matchProposalId,
+            sender = sender,
+            senderWeight = 54.0,
+            receiver = receiver,
+            receiverWeight = 55.0,
+            weightClass = WeightClass.BANTAM,
+        )
+
+        given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.of(matchProposal))
+
+        // when
+        // then
+        assertThrows(UserIsNotReceiverException::class.java) {
+            matchProposalService.rejectProposal(matchProposalId, user)
+        }
+    }
+
+    @Test
+    fun `# rejectProposal failed - matchProposal 찾을 수 없음 MatchProposalNotFoundException`() {
+        // given
+        val matchProposalId = 1L
+
+        val user = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+
+        given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.empty())
+
+        // when
+        // then
+        assertThrows(MatchProposalNotFoundException::class.java) {
+            matchProposalService.rejectProposal(matchProposalId, user)
+        }
+    }
+
+    @Test
     fun `# cancelMyProposal success`() {
         // given
         val matchProposalId = 1L
 
-        val receiver = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
-        val user = User(id = 2L, nickname = "sender", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val user = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val receiver = User(id = 2L, nickname = "receiver", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
         val matchProposal = MatchProposal(
             id = matchProposalId,
             sender = user,
@@ -283,12 +372,55 @@ class MatchProposalServiceTest {
             weightClass = WeightClass.BANTAM,
         )
 
-        given(matchProposalRepository.findById(matchProposalId)).willReturn(Optional.of(matchProposal))
+        given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.of(matchProposal))
 
         // when
         matchProposalService.cancelMyProposal(matchProposalId, user)
 
         // then
         verify(matchProposalRepository).delete(matchProposal)
+    }
+
+    @Test
+    fun `# cancelMyProposal failed - `() {
+        // given
+        val matchProposalId = 1L
+
+        val user = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val receiver = User(id = 2L, nickname = "receiver", email = "test2@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+        val sender = User(id = 3L, nickname = "sender", email = "test3@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+
+        val matchProposal = MatchProposal(
+            id = matchProposalId,
+            sender = sender,
+            senderWeight = 54.0,
+            receiver = receiver,
+            receiverWeight = 55.0,
+            weightClass = WeightClass.BANTAM,
+        )
+
+        given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.of(matchProposal))
+
+        // when
+        // then
+        assertThrows(UserIsNotSenderException::class.java) {
+            matchProposalService.cancelMyProposal(matchProposalId, user)
+        }
+    }
+
+    @Test
+    fun `# cancelMyProposal failed -  `() {
+        // given
+        val matchProposalId = 1L
+
+        val user = User(id = 1L, nickname = "user", email = "test1@gmail.com", password = "encoded", status = UserStatus.REGISTERED)
+
+        given(matchProposalRepository.findByIdWithLock(matchProposalId)).willReturn(Optional.empty())
+
+        // when
+        // then
+        assertThrows(MatchProposalNotFoundException::class.java) {
+            matchProposalService.cancelMyProposal(matchProposalId, user)
+        }
     }
 }
