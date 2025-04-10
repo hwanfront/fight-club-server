@@ -30,4 +30,17 @@ object MatchProposalConstants {
         const val CODE = "MPS005"
         const val MESSAGE = "매치 요청을 취소하였습니다."
     }
+
+    object MatchProposalNotFound {
+        const val STATUS_CODE = "404"
+        const val CODE = "MPE001"
+        const val MESSAGE = "매치 요청을 찾을 수 없습니다."
+    }
+
+    object UserIsNotReceiver {
+        const val STATUS_CODE = "403"
+        const val CODE = "MPE002"
+        const val MESSAGE = "해당 매치 요청의 수신자가 아닙니다."
+
+    }
 }
