@@ -19,11 +19,13 @@ class MatchProposalService(
 ) {
 
     fun getReceivedMatchProposalList(user: User): List<ReceivedMatchProposalResponse> {
-        return listOf()
+        val proposalList = matchProposalRepository.findAllByReceiver(user)
+        return proposalList.map(matchProposalMapper::toReceivedMatchProposalResponse)
     }
 
     fun getSentMatchProposalList(user: User): List<SentMatchProposalResponse> {
-        return listOf()
+        val proposalList = matchProposalRepository.findAllBySender(user)
+        return proposalList.map(matchProposalMapper::toSentMatchProposalResponse)
     }
 
     fun acceptProposal(matchProposalId: Long, user: User): AcceptResponse {
