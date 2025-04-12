@@ -3,6 +3,7 @@ package com.fightclub.fight_club_server.match.service
 import com.fightclub.fight_club_server.match.domain.Match
 import com.fightclub.fight_club_server.match.domain.MatchReadyStatus
 import com.fightclub.fight_club_server.match.domain.MatchStatus
+import com.fightclub.fight_club_server.match.dto.MatchInfoResponse
 import com.fightclub.fight_club_server.match.dto.MatchResponse
 import com.fightclub.fight_club_server.match.mapper.MatchMapper
 import com.fightclub.fight_club_server.match.repository.MatchMessageRepository
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.BDDMockito.given
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 class MatchServiceTest {
@@ -103,7 +105,6 @@ class MatchServiceTest {
         )
 
         val matchList = listOf(match1, match2, match3)
-        val mappedMatchList = listOf(matchResponse1, matchResponse2, matchResponse3)
 
         given(matchRepository.findMatchesByUserId(userId)).willReturn(matchList)
 
@@ -112,5 +113,43 @@ class MatchServiceTest {
 
         // then
         assertThat(result).containsExactlyInAnyOrder(matchResponse1, matchResponse2, matchResponse3)
+    }
+
+    @Test
+    fun getMatchInfo() {
+        // given
+        val userId = 1L
+        val matchId = 1L
+        val user = User(id = userId, nickname = "user")
+        val match = Match(
+            id = matchId,
+            user1 = user,
+            user2 = User(id = 2L, nickname = "opponent1"),
+            status = MatchStatus.CHATTING,
+            readyStatus = MatchReadyStatus.USER1_READY,
+            weightClass = WeightClass.BANTAM,
+            user1Weight = 54.0,
+            user2Weight = 55.0,
+        )
+
+        val matchInfo = MatchInfoResponse(
+            matchId = matchId,
+            myNickname = match.user1.nickname,
+            myWeight = match.user1Weight,
+            opponentNickname = match.user2.nickname,
+            opponentWeight = match.user2Weight,
+            weightClass = match.weightClass,
+            isMeReady = true,
+            isOpponentReady = false,
+            matchedAt = match.matchedAt,
+        )
+
+        given(matchRepository.findById(matchId)).willReturn(Optional.of(match))
+
+        // when
+        val result = matchService.getMatchInfo(matchId, user)
+
+        // then
+        assertThat(result).isEqualTo(matchInfo)
     }
 }
