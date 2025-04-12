@@ -19,11 +19,12 @@ class MatchController(
         @AuthenticationPrincipal user: User,
     ) = BaseResponse.success(MatchSuccessCode.GET_MY_MATCH_LIST_SUCCESS, matchService.getMatchList(user))
 
-    @GetMapping("/")
+    @GetMapping("/{matchId}")
     @PreAuthorize("isAuthenticated()")
     fun matchInfo(
+        @PathVariable matchId: Long,
         @AuthenticationPrincipal user: User,
-    ) = BaseResponse.success(MatchSuccessCode.GET_MATCH_INFO_SUCCESS, matchService.getMatchInfo(user))
+    ) = BaseResponse.success(MatchSuccessCode.GET_MATCH_INFO_SUCCESS, matchService.getMatchInfo(matchId, user))
 
     @PostMapping("/{matchId}/ready")
     @PreAuthorize("isAuthenticated()")

@@ -20,7 +20,7 @@ class MatchService(
         return emptyList()
     }
 
-    fun getMatchInfo(user: User): MatchInfoResponse {
+    fun getMatchInfo(matchId: Long, user: User): MatchInfoResponse {
         return MatchInfoResponse(
             matchId = TODO(),
             myNickname = TODO(),
