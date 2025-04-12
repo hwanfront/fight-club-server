@@ -5,7 +5,7 @@ import com.fightclub.fight_club_server.user.domain.User
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
-@Entity(name = "matches")
+@Entity
 @Table(name = "matches")
 class Match(
 
@@ -20,6 +20,9 @@ class Match(
 
     @Enumerated(EnumType.STRING)
     var status: MatchStatus = MatchStatus.CHATTING,
+
+    @Enumerated(EnumType.STRING)
+    var readyStatus: MatchReadyStatus = MatchReadyStatus.NONE,
 
     @Enumerated(EnumType.STRING)
     val weightClass: WeightClass,
