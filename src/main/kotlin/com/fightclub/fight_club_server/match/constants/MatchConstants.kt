@@ -48,4 +48,17 @@ object MatchConstants {
         const val CODE = "MS008"
         const val MESSAGE = "방송 종류"
     }
+
+
+    object MatchNotFound {
+        const val STATUS_CODE = "404"
+        const val CODE = "ME001"
+        const val MESSAGE = "매치를 찾을 수 없습니다."
+    }
+
+    object UserIsNotParticipant {
+        const val STATUS_CODE = "403"
+        const val CODE = "ME002"
+        const val MESSAGE = "사용자가 매치 참가자가 아닙니다."
+    }
 }
