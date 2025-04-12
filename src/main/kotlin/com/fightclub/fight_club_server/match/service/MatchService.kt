@@ -17,7 +17,9 @@ class MatchService(
 ) {
 
     fun getMatchList(user: User): List<MatchResponse> {
-        return emptyList()
+        val userId = user.id!!
+        val matchList = matchRepository.findMatchesByUserId(userId)
+        return matchList.map { match -> matchMapper.toResponse(match, user) }
     }
 
     fun getMatchInfo(matchId: Long, user: User): MatchInfoResponse {
