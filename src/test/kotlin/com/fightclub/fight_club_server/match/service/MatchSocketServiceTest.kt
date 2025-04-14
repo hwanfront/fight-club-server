@@ -4,6 +4,8 @@ import com.fightclub.fight_club_server.match.domain.Match
 import com.fightclub.fight_club_server.match.domain.MatchReadyStatus
 import com.fightclub.fight_club_server.match.domain.MatchStatus
 import com.fightclub.fight_club_server.match.dto.*
+import com.fightclub.fight_club_server.match.exception.MatchNotFoundException
+import com.fightclub.fight_club_server.match.exception.UserIsNotParticipantException
 import com.fightclub.fight_club_server.match.mapper.MatchMapper
 import com.fightclub.fight_club_server.match.repository.MatchRepository
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
@@ -170,6 +172,53 @@ class MatchSocketServiceTest {
     }
 
     @Test
+    fun `updateReadyStatus failed - MatchNotFound`() {
+        // given
+        val matchId = 1L
+
+        val user = User(id = 1L, nickname = "user")
+        val readyRequest = ReadyRequest(matchId = matchId)
+
+        given(matchRepository.findByIdWithLock(matchId)).willReturn(Optional.empty())
+
+        // when
+        // then
+        assertThrows(MatchNotFoundException::class.java) {
+            matchSocketService.updateReadyStatus(user, readyRequest)
+        }
+    }
+
+    @Test
+    fun `updateReadyStatus failed - UserIsNotParticipant`() {
+        // given
+        val matchId = 1L
+
+        val user = User(id = 1L, nickname = "user")
+        val other1 = User(id = 2L, nickname = "other")
+        val other2 = User(id = 3L, nickname = "other")
+        val readyRequest = ReadyRequest(matchId = matchId)
+
+        val match = Match(
+            id = matchId,
+            user1 = other1,
+            user2 = other2,
+            status = MatchStatus.CHATTING,
+            readyStatus = MatchReadyStatus.NONE,
+            weightClass = WeightClass.BANTAM,
+            user1Weight = 55.0,
+            user2Weight = 54.0,
+        )
+
+        given(matchRepository.findByIdWithLock(matchId)).willReturn(Optional.of(match))
+
+        // when
+        // then
+        assertThrows(UserIsNotParticipantException::class.java) {
+            matchSocketService.updateReadyStatus(user, readyRequest)
+        }
+    }
+
+    @Test
     fun `declineMatch success`() {
         // given
         val userId = 1L
@@ -210,6 +259,52 @@ class MatchSocketServiceTest {
         assertThat(savedMatch.readyStatus).isEqualTo(MatchReadyStatus.NONE)
         assertThat(savedMatch.status).isEqualTo(MatchStatus.DECLINED)
         assertThat(result).isEqualTo(declineMatchResponse)
+    }
 
+    @Test
+    fun `declineMatch failed - MatchNotFound`() {
+        // given
+        val matchId = 1L
+
+        val user = User(id = 1L, nickname = "user")
+        val declineRequest = DeclineRequest(matchId = matchId)
+
+        given(matchRepository.findByIdWithLock(matchId)).willReturn(Optional.empty())
+
+        // when
+        // then
+        assertThrows(MatchNotFoundException::class.java) {
+            matchSocketService.declineMatch(user, declineRequest)
+        }
+    }
+
+    @Test
+    fun `declineMatch failed - UserIsNotParticipant`() {
+        // given
+        val matchId = 1L
+
+        val user = User(id = 1L, nickname = "user")
+        val other1 = User(id = 2L, nickname = "other")
+        val other2 = User(id = 3L, nickname = "other")
+        val declineRequest = DeclineRequest(matchId = matchId)
+
+        val match = Match(
+            id = matchId,
+            user1 = other1,
+            user2 = other2,
+            status = MatchStatus.CHATTING,
+            readyStatus = MatchReadyStatus.NONE,
+            weightClass = WeightClass.BANTAM,
+            user1Weight = 55.0,
+            user2Weight = 54.0,
+        )
+
+        given(matchRepository.findByIdWithLock(matchId)).willReturn(Optional.of(match))
+
+        // when
+        // then
+        assertThrows(UserIsNotParticipantException::class.java) {
+            matchSocketService.declineMatch(user, declineRequest)
+        }
     }
 }
