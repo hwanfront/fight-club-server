@@ -27,15 +27,11 @@ class MatchService(
     fun getMatchInfo(matchId: Long, user: User): MatchInfoResponse {
         val match = matchRepository.findById(matchId).orElseThrow { MatchNotFoundException() }
 
-        if(match.user1.id != user.id && match.user2.id != user.id) {
+        if(!match.isParticipant(user)) {
             throw UserIsNotParticipantException()
         }
 
         return matchMapper.toInfoResponse(match, user)
-    }
-
-    fun readyToStream(matchId: Long, user: User): Unit {
-
     }
 
     fun declineMatch(matchId: Long, user: User): Unit {

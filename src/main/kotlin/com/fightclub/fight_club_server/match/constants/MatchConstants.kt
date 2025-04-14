@@ -13,12 +13,6 @@ object MatchConstants {
         const val MESSAGE = "내 매치 목록 조회를 성공하였습니다."
     }
 
-    object ReadyToStreamSuccess {
-        const val STATUS_CODE = "200"
-        const val CODE = "MS003"
-        const val MESSAGE = "매치 준비 완료"
-    }
-
     object DeclineMatchSuccess {
         const val STATUS_CODE = "200"
         const val CODE = "MS004"
@@ -60,5 +54,11 @@ object MatchConstants {
         const val STATUS_CODE = "403"
         const val CODE = "ME002"
         const val MESSAGE = "사용자가 매치 참가자가 아닙니다."
+    }
+
+
+    object MatchReadyUpdatedSuccess {
+        const val CODE = "MATCH_READY_UPDATED"
+        const val MESSAGE = "사용자 준비 상태가 변경되었습니다."
     }
 }

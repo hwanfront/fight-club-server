@@ -26,13 +26,6 @@ class MatchController(
         @AuthenticationPrincipal user: User,
     ) = BaseResponse.success(MatchSuccessCode.GET_MATCH_INFO_SUCCESS, matchService.getMatchInfo(matchId, user))
 
-    @PostMapping("/{matchId}/ready")
-    @PreAuthorize("isAuthenticated()")
-    fun ready(
-        @PathVariable matchId: Long,
-        @AuthenticationPrincipal user: User,
-    ) = BaseResponse.success(MatchSuccessCode.READY_TO_STREAM_SUCCESS, matchService.readyToStream(matchId, user))
-
     @PostMapping("/{matchId}/decline")
     @PreAuthorize("isAuthenticated()")
     fun decline(

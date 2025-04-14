@@ -1,5 +1,6 @@
 package com.fightclub.fight_club_server.match.dto
 
+import com.fightclub.fight_club_server.match.domain.MatchStatus
 import com.fightclub.fight_club_server.meta.enums.WeightClass
 import io.swagger.v3.oas.annotations.media.Schema
 import java.time.LocalDateTime
@@ -17,6 +18,8 @@ data class MatchInfoResponse(
     val opponentWeight: Double,
     @Schema(description = "체급", example = "BANTAM")
     val weightClass: WeightClass,
+    @Schema(description = "매치 상태", example = "CHATTING")
+    val matchStatus: MatchStatus,
 
     @Schema(description = "내 준비 유무", example = "true")
     val isMeReady: Boolean,

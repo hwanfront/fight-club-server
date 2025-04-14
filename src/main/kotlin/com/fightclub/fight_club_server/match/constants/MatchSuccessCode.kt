@@ -10,7 +10,6 @@ enum class MatchSuccessCode(
 ): ResponseCode {
     GET_MY_MATCH_LIST_SUCCESS(HttpStatus.OK, MatchConstants.GetMyMatchListSuccess.CODE, MatchConstants.GetMyMatchListSuccess.MESSAGE),
     GET_MATCH_INFO_SUCCESS(HttpStatus.OK, MatchConstants.GetMatchInfoSuccess.CODE, MatchConstants.GetMatchInfoSuccess.MESSAGE),
-    READY_TO_STREAM_SUCCESS(HttpStatus.OK, MatchConstants.ReadyToStreamSuccess.CODE, MatchConstants.ReadyToStreamSuccess.MESSAGE),
     DECLINE_MATCH_SUCCESS(HttpStatus.OK, MatchConstants.DeclineMatchSuccess.CODE, MatchConstants.DeclineMatchSuccess.MESSAGE),
     START_MATCH_STREAMING_SUCCESS(HttpStatus.OK, MatchConstants.StartMatchStreamingSuccess.CODE, MatchConstants.StartMatchStreamingSuccess.MESSAGE),
     PAUSE_MATCH_STREAMING_SUCCESS(HttpStatus.OK, MatchConstants.PauseMatchStreamingSuccess.CODE, MatchConstants.PauseMatchStreamingSuccess.MESSAGE),

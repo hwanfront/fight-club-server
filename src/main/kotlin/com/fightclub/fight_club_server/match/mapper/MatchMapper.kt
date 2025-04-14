@@ -3,6 +3,7 @@ package com.fightclub.fight_club_server.match.mapper
 import com.fightclub.fight_club_server.match.domain.Match
 import com.fightclub.fight_club_server.match.domain.MatchReadyStatus
 import com.fightclub.fight_club_server.match.dto.MatchInfoResponse
+import com.fightclub.fight_club_server.match.dto.MatchReadyResponse
 import com.fightclub.fight_club_server.match.dto.MatchResponse
 import com.fightclub.fight_club_server.user.domain.User
 import org.springframework.stereotype.Component
@@ -49,9 +50,20 @@ class MatchMapper {
             opponentNickname = opponentNickname,
             opponentWeight = opponentWeight,
             weightClass = match.weightClass,
+            matchStatus = match.status,
             isMeReady = isMeReady,
             isOpponentReady = isOpponentReady,
             matchedAt = match.matchedAt,
+        )
+    }
+
+    fun toMatchReadyResponse(match: Match, user: User): MatchReadyResponse {
+        val (isMeReady, isOpponentReady) = getReadyStatus(match, user)
+
+        return MatchReadyResponse(
+            matchId = match.id!!,
+            isMeReady = isMeReady,
+            isOpponentReady = isOpponentReady,
         )
     }
 

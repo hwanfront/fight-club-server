@@ -32,4 +32,25 @@ class Match(
     val user2Weight: Double,
 
     val matchedAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    fun isParticipant(user: User): Boolean {
+        return listOfNotNull(user1.id, user2.id).contains(user.id)
+    }
+
+    fun updateReadyStatus(user: User) {
+        val isUser1 = this.user1.id == user.id
+
+        this.readyStatus = when(this.readyStatus) {
+            MatchReadyStatus.NONE -> if (isUser1) MatchReadyStatus.USER1_READY else MatchReadyStatus.USER2_READY
+            MatchReadyStatus.USER1_READY -> if (isUser1) MatchReadyStatus.USER1_READY else MatchReadyStatus.ALL_READY
+            MatchReadyStatus.USER2_READY -> if (isUser1) MatchReadyStatus.ALL_READY else MatchReadyStatus.USER2_READY
+            MatchReadyStatus.ALL_READY -> MatchReadyStatus.ALL_READY
+        }
+
+        if(this.readyStatus == MatchReadyStatus.ALL_READY) {
+            this.status = MatchStatus.READY_TO_STREAM
+        } else {
+            this.status = MatchStatus.CHATTING
+        }
+    }
+}
