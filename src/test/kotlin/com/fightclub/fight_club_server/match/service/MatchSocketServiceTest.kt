@@ -3,9 +3,7 @@ package com.fightclub.fight_club_server.match.service
 import com.fightclub.fight_club_server.match.domain.Match
 import com.fightclub.fight_club_server.match.domain.MatchReadyStatus
 import com.fightclub.fight_club_server.match.domain.MatchStatus
-import com.fightclub.fight_club_server.match.dto.MatchReadyResponse
-import com.fightclub.fight_club_server.match.dto.MatchResponse
-import com.fightclub.fight_club_server.match.dto.ReadyRequest
+import com.fightclub.fight_club_server.match.dto.*
 import com.fightclub.fight_club_server.match.mapper.MatchMapper
 import com.fightclub.fight_club_server.match.repository.MatchRepository
 import com.fightclub.fight_club_server.matchingWait.domain.MatchingWait
@@ -169,5 +167,49 @@ class MatchSocketServiceTest {
         assertThat(savedMatch.readyStatus).isEqualTo(MatchReadyStatus.ALL_READY)
         assertThat(savedMatch.status).isEqualTo(MatchStatus.READY_TO_STREAM)
         assertThat(result).isEqualTo(matchReadyResponse)
+    }
+
+    @Test
+    fun `declineMatch success`() {
+        // given
+        val userId = 1L
+        val otherId = 2L
+        val matchId = 1L
+
+        val user = User(id = userId, nickname = "user")
+        val other = User(id = otherId, nickname = "other")
+        val declineRequest = DeclineRequest(matchId = matchId)
+
+        val match = Match(
+            id = matchId,
+            user1 = user,
+            user2 = other,
+            status = MatchStatus.CHATTING,
+            readyStatus = MatchReadyStatus.USER1_READY,
+            weightClass = WeightClass.BANTAM,
+            user1Weight = 55.0,
+            user2Weight = 54.0,
+        )
+
+        val declineMatchResponse = DeclineMatchResponse(
+            matchId = matchId,
+            declinedBy = user.nickname,
+        )
+
+        val captor = argumentCaptor<Match>()
+        given(matchRepository.findByIdWithLock(matchId)).willReturn(Optional.of(match))
+
+        // when
+        val result = matchSocketService.declineMatch(user, declineRequest)
+
+        // then
+        verify(matchRepository).save(captor.capture())
+
+        val savedMatch = captor.firstValue
+
+        assertThat(savedMatch.readyStatus).isEqualTo(MatchReadyStatus.NONE)
+        assertThat(savedMatch.status).isEqualTo(MatchStatus.DECLINED)
+        assertThat(result).isEqualTo(declineMatchResponse)
+
     }
 }
