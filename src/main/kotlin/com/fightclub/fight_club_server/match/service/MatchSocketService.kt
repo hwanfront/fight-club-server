@@ -1,5 +1,6 @@
 package com.fightclub.fight_club_server.match.service
 
+import com.fightclub.fight_club_server.match.domain.MatchStatus
 import com.fightclub.fight_club_server.match.dto.DeclineMatchResponse
 import com.fightclub.fight_club_server.match.dto.DeclineRequest
 import com.fightclub.fight_club_server.match.dto.MatchReadyResponse
@@ -37,6 +38,10 @@ class MatchSocketService(
 
         if (!match.isParticipant(user)) {
             throw UserIsNotParticipantException()
+        }
+
+        if (match.status == MatchStatus.DECLINED) {
+            throw MatchNotFoundException()
         }
 
         match.declineMatch()

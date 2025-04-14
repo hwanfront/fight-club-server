@@ -10,7 +10,7 @@ object MatchConstants {
     object GetMatchInfoSuccess {
         const val STATUS_CODE = "200"
         const val CODE = "MS002"
-        const val MESSAGE = "내 매치 목록 조회를 성공하였습니다."
+        const val MESSAGE = "매치 정보 조회를 성공하였습니다."
     }
 
     object StartMatchStreamingSuccess {

@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param
 import java.util.Optional
 
 interface MatchRepository: JpaRepository<Match, Long> {
-    @Query("SELECT m FROM Match m WHERE m.user1.id = :userId OR m.user2.id = :userId")
+    @Query("SELECT m FROM Match m WHERE (m.user1 = :user OR m.user2 = :user) AND m.status <> 'DECLINED'")
     fun findMatchesByUserId(@Param("userId") userId: Long): List<Match>
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
