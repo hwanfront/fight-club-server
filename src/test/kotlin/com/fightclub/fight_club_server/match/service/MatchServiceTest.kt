@@ -139,6 +139,7 @@ class MatchServiceTest {
             opponentNickname = match.user2.nickname,
             opponentWeight = match.user2Weight,
             weightClass = match.weightClass,
+            matchStatus = MatchStatus.CHATTING,
             isMeReady = true,
             isOpponentReady = false,
             matchedAt = match.matchedAt,
