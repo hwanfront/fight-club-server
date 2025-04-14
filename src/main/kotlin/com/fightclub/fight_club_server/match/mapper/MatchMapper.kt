@@ -64,6 +64,7 @@ class MatchMapper {
             matchId = match.id!!,
             isMeReady = isMeReady,
             isOpponentReady = isOpponentReady,
+            matchStatus = match.status,
         )
     }
 
