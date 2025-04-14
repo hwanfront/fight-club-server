@@ -28,8 +28,24 @@ class SecurityConfig(
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
-                it.requestMatchers("/api/auth/**", "/api/auth/refresh", "/api/users/signup", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-                it.anyRequest().authenticated()
+                it
+                    .requestMatchers(
+                        "/ws",
+                        "/ws/**",
+                        "/ws-sockjs/**",
+                        "/ws/pub/**",
+                        "/ws/sub/**",
+
+                        "/api/auth/**",
+                        "/api/auth/refresh",
+                        "/api/users/signup",
+
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+
+                        "/socket-test.html").permitAll()
+                    .anyRequest().authenticated()
             }
             .oauth2Login {
                 it.userInfoEndpoint { it.userService(customOAuth2UserService) }
