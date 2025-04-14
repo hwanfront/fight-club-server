@@ -34,10 +34,6 @@ class MatchService(
         return matchMapper.toInfoResponse(match, user)
     }
 
-    fun declineMatch(matchId: Long, user: User): Unit {
-
-    }
-
     fun startMatchStreaming(matchId: Long, user: User): Unit {
 
     }
