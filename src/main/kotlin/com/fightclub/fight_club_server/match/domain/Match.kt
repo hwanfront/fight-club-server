@@ -53,4 +53,9 @@ class Match(
             this.status = MatchStatus.CHATTING
         }
     }
+
+    fun declineMatch() {
+        this.readyStatus = MatchReadyStatus.NONE
+        this.status = MatchStatus.DECLINED
+    }
 }

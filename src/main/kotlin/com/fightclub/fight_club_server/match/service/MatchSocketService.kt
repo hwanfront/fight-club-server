@@ -1,5 +1,7 @@
 package com.fightclub.fight_club_server.match.service
 
+import com.fightclub.fight_club_server.match.dto.DeclineMatchResponse
+import com.fightclub.fight_club_server.match.dto.DeclineRequest
 import com.fightclub.fight_club_server.match.dto.MatchReadyResponse
 import com.fightclub.fight_club_server.match.dto.ReadyRequest
 import com.fightclub.fight_club_server.match.exception.MatchNotFoundException
@@ -27,5 +29,19 @@ class MatchSocketService(
         matchRepository.save(match)
 
         return matchMapper.toMatchReadyResponse(match, user)
+    }
+
+    @Transactional
+    fun declineMatch(user: User, declineRequest: DeclineRequest): DeclineMatchResponse {
+        val match = matchRepository.findByIdWithLock(declineRequest.matchId).orElseThrow { throw MatchNotFoundException() }
+
+        if (!match.isParticipant(user)) {
+            throw UserIsNotParticipantException()
+        }
+
+        match.declineMatch()
+        matchRepository.save(match)
+
+        return matchMapper.toDeclineMatchResponse(match, user)
     }
 }

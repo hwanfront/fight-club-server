@@ -2,6 +2,7 @@ package com.fightclub.fight_club_server.match.mapper
 
 import com.fightclub.fight_club_server.match.domain.Match
 import com.fightclub.fight_club_server.match.domain.MatchReadyStatus
+import com.fightclub.fight_club_server.match.dto.DeclineMatchResponse
 import com.fightclub.fight_club_server.match.dto.MatchInfoResponse
 import com.fightclub.fight_club_server.match.dto.MatchReadyResponse
 import com.fightclub.fight_club_server.match.dto.MatchResponse
@@ -65,6 +66,13 @@ class MatchMapper {
             isMeReady = isMeReady,
             isOpponentReady = isOpponentReady,
             matchStatus = match.status,
+        )
+    }
+
+    fun toDeclineMatchResponse(match: Match, user: User): DeclineMatchResponse {
+        return DeclineMatchResponse(
+            matchId = match.id!!,
+            declinedBy = user.nickname
         )
     }
 

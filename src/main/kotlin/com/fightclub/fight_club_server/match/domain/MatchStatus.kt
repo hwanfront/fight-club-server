@@ -5,5 +5,6 @@ enum class MatchStatus {
     READY_TO_STREAM,    // 방송 준비 완료
     STREAMING,          // 방송 중
     PAUSED,             // 방송 일시 중지
-    ENDED               // 매치 종료
+    ENDED,              // 매치 종료
+    DECLINED            // 거절된 매치
 }

@@ -7,4 +7,5 @@ enum class MatchSocketSuccessCode(
     override val message: String,
 ): SocketResponseCode {
     MATCH_READY_UPDATED_SUCCESS(MatchConstants.MatchReadyUpdatedSuccess.CODE, MatchConstants.MatchReadyUpdatedSuccess.MESSAGE),
+    DECLINE_MATCH_SUCCESS(MatchConstants.DeclineMatchSuccess.CODE, MatchConstants.DeclineMatchSuccess.MESSAGE),
 }

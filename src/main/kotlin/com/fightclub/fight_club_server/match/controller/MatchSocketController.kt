@@ -1,7 +1,9 @@
 package com.fightclub.fight_club_server.match.controller
 
 import com.fightclub.fight_club_server.common.dto.SocketResponse
+import com.fightclub.fight_club_server.common.exception.SocketCodeException
 import com.fightclub.fight_club_server.match.constants.MatchSocketSuccessCode
+import com.fightclub.fight_club_server.match.dto.DeclineRequest
 import com.fightclub.fight_club_server.match.dto.ReadyRequest
 import com.fightclub.fight_club_server.match.exception.MatchNotFoundException
 import com.fightclub.fight_club_server.match.exception.UserIsNotParticipantException
@@ -30,16 +32,32 @@ class MatchSocketController(
                 "/ws/sub/match/room/${readyRequest.matchId}",
                 SocketResponse.success(MatchSocketSuccessCode.MATCH_READY_UPDATED_SUCCESS, data)
             )
-        } catch (e: MatchNotFoundException) {
+        } catch (e: Exception) {
+            if (e is SocketCodeException) {
+                messagingTemplate.convertAndSend(
+                    "/ws/sub/match/room/${readyRequest.matchId}",
+                    SocketResponse.error(e.socketResponseCode)
+                )
+            }
+        }
+    }
+
+    @MessageMapping("/match.decline")
+    fun decline(@Payload declineRequest: DeclineRequest, principal: Principal) {
+        try {
+            val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundException()
+            val data = matchSocketService.declineMatch(user, declineRequest)
             messagingTemplate.convertAndSend(
-                "/ws/sub/match/room/${readyRequest.matchId}",
-                SocketResponse.error(e.socketResponseCode)
+                "/ws/sub/match/room/${declineRequest.matchId}",
+                SocketResponse.success(MatchSocketSuccessCode.DECLINE_MATCH_SUCCESS, data)
             )
-        } catch (e: UserIsNotParticipantException) {
-            messagingTemplate.convertAndSend(
-                "/ws/sub/match/room/${readyRequest.matchId}",
-                SocketResponse.error(e.socketResponseCode)
-            )
+        } catch (e: Exception) {
+            if (e is SocketCodeException) {
+                messagingTemplate.convertAndSend(
+                    "/ws/sub/match/room/${declineRequest.matchId}",
+                    SocketResponse.error(e.socketResponseCode)
+                )
+            }
         }
     }
 }
