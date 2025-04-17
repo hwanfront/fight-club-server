@@ -37,6 +37,12 @@ object MatchConstants {
         const val MESSAGE = "방송 종류"
     }
 
+    object GetChatMessageListSuccess {
+        const val STATUS_CODE = "200"
+        const val CODE = "MS009"
+        const val MESSAGE = "매치 채팅목록 조회를 성공하였습니다."
+    }
+
 
     object MatchNotFound {
         const val STATUS_CODE = "404"

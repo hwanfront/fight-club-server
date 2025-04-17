@@ -22,7 +22,5 @@ class ChatMessage (
     @Enumerated(EnumType.STRING)
     val messageType: ChatMessageType,
 
-    val isRead: Boolean,
-
     val sentAt: LocalDateTime = LocalDateTime.now()
 )

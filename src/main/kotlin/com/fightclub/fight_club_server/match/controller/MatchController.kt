@@ -2,6 +2,7 @@ package com.fightclub.fight_club_server.match.controller
 
 import com.fightclub.fight_club_server.common.dto.BaseResponse
 import com.fightclub.fight_club_server.match.constants.MatchSuccessCode
+import com.fightclub.fight_club_server.match.service.ChatMessageService
 import com.fightclub.fight_club_server.match.service.MatchService
 import com.fightclub.fight_club_server.user.domain.User
 import org.springframework.security.access.prepost.PreAuthorize
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/match")
 class MatchController(
-    private val matchService: MatchService
+    private val matchService: MatchService,
+    private val chatMessageService: ChatMessageService,
 ) {
     @GetMapping("/")
     @PreAuthorize("isAuthenticated()")
@@ -25,6 +27,21 @@ class MatchController(
         @PathVariable matchId: Long,
         @AuthenticationPrincipal user: User,
     ) = BaseResponse.success(MatchSuccessCode.GET_MATCH_INFO_SUCCESS, matchService.getMatchInfo(matchId, user))
+
+    @GetMapping("/{matchId}/messages/latest")
+    fun getLatestMessages(
+        @PathVariable matchId: Long,
+        @RequestParam(defaultValue = "30") size: Int,
+        @AuthenticationPrincipal user: User,
+    ) = BaseResponse.success(MatchSuccessCode.GET_CHAT_MESSAGE_LIST_SUCCESS, chatMessageService.getLatestMessageList(matchId, user, size))
+
+    @GetMapping("/{matchId}/messages/before/{beforeMessageId}")
+    fun getBeforeMessages(
+        @PathVariable matchId: Long,
+        @PathVariable beforeMessageId: Long,
+        @RequestParam(defaultValue = "30") size: Int,
+        @AuthenticationPrincipal user: User,
+    ) = BaseResponse.success(MatchSuccessCode.GET_CHAT_MESSAGE_LIST_SUCCESS, chatMessageService.getBeforeMessageList(matchId, beforeMessageId, user, size))
 
     @PostMapping("/{matchId}/start")
     @PreAuthorize("isAuthenticated()")
