@@ -66,4 +66,9 @@ object MatchConstants {
         const val CODE = "DECLINE_MATCH"
         const val MESSAGE = "매치가 거절되었습니다."
     }
+
+    object NewChatMessageReceivedSuccess {
+        const val CODE = "NEW_CHAT_MESSAGE_RECEIVED"
+        const val MESSAGE = "채팅 메시지를 수신했습니다."
+    }
 }
