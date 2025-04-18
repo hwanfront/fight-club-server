@@ -2,8 +2,12 @@ package com.fightclub.fight_club_server.user.exception
 
 import com.fightclub.fight_club_server.user.constants.UserErrorCode
 import com.fightclub.fight_club_server.common.exception.BaseException
+import com.fightclub.fight_club_server.common.exception.SocketBaseException
+import com.fightclub.fight_club_server.user.constants.UserSocketErrorCode
 
 class UserNotFoundException : BaseException(UserErrorCode.USER_NOT_FOUND)
 class UserAlreadyExistsException : BaseException(UserErrorCode.USER_ALREADY_EXIST)
 class UserNotWaitingStatusException : BaseException(UserErrorCode.USER_NOT_WAITING_STATUS)
 class DeletedUserException : BaseException(UserErrorCode.USER_DELETED)
+
+class UserNotFoundSocketException: SocketBaseException(UserSocketErrorCode.USER_NOT_FOUND)

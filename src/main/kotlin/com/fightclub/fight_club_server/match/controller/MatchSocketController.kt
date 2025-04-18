@@ -5,10 +5,12 @@ import com.fightclub.fight_club_server.common.exception.SocketCodeException
 import com.fightclub.fight_club_server.match.constants.MatchSocketSuccessCode
 import com.fightclub.fight_club_server.match.dto.ChatMessageRequest
 import com.fightclub.fight_club_server.match.dto.DeclineRequest
+import com.fightclub.fight_club_server.match.dto.ReadChatMessageRequest
 import com.fightclub.fight_club_server.match.dto.ReadyRequest
 import com.fightclub.fight_club_server.match.service.ChatMessageService
+import com.fightclub.fight_club_server.match.service.MatchReadStatusService
 import com.fightclub.fight_club_server.match.service.MatchService
-import com.fightclub.fight_club_server.user.exception.UserNotFoundException
+import com.fightclub.fight_club_server.user.exception.UserNotFoundSocketException
 import com.fightclub.fight_club_server.user.repository.UserRepository
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
@@ -21,13 +23,14 @@ class MatchSocketController(
     private val matchService: MatchService,
     private val chatMessageService: ChatMessageService,
     private val userRepository: UserRepository,
-    private val messagingTemplate: SimpMessagingTemplate
+    private val messagingTemplate: SimpMessagingTemplate,
+    private val matchReadStatusService: MatchReadStatusService
 ) {
 
     @MessageMapping("/match.ready")
     fun ready(@Payload readyRequest: ReadyRequest, principal: Principal) {
         try {
-            val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundException()
+            val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundSocketException()
             val data = matchService.updateReadyStatus(user, readyRequest)
             messagingTemplate.convertAndSend(
                 "/ws/sub/match/room/${readyRequest.matchId}",
@@ -46,7 +49,7 @@ class MatchSocketController(
     @MessageMapping("/match.decline")
     fun decline(@Payload declineRequest: DeclineRequest, principal: Principal) {
         try {
-            val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundException()
+            val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundSocketException()
             val data = matchService.declineMatch(user, declineRequest)
             messagingTemplate.convertAndSend(
                 "/ws/sub/match/room/${declineRequest.matchId}",
@@ -65,7 +68,7 @@ class MatchSocketController(
     @MessageMapping("/match.chat")
     fun sendChatMessage(@Payload chatMessageRequest: ChatMessageRequest, principal: Principal) {
         try {
-            val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundException()
+            val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundSocketException()
             val data = chatMessageService.saveChatMessage(user, chatMessageRequest)
             messagingTemplate.convertAndSend(
                 "/ws/sub/match/room/${chatMessageRequest.matchId}",
@@ -75,6 +78,25 @@ class MatchSocketController(
             if (e is SocketCodeException) {
                 messagingTemplate.convertAndSend(
                     "/ws/sub/match/room/${chatMessageRequest.matchId}",
+                    SocketResponse.error(e.socketResponseCode)
+                )
+            }
+        }
+    }
+
+    @MessageMapping("/match.read")
+    fun readChatMessage(@Payload readChatMessageRequest: ReadChatMessageRequest, principal: Principal) {
+        try {
+            val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundSocketException()
+            val response = matchReadStatusService.updateLastReadMessage(readChatMessageRequest, user)
+            messagingTemplate.convertAndSend(
+                "/ws/sub/match/room/${readChatMessageRequest.matchId}",
+                SocketResponse.success(MatchSocketSuccessCode.NEW_CHAT_MESSAGE_RECEIVED_SUCCESS, response)
+            )
+        } catch (e: Exception) {
+            if (e is SocketCodeException) {
+                messagingTemplate.convertAndSend(
+                    "/ws/sub/match/room/${readChatMessageRequest.matchId}",
                     SocketResponse.error(e.socketResponseCode)
                 )
             }

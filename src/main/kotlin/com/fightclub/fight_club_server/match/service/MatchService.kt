@@ -3,7 +3,8 @@ package com.fightclub.fight_club_server.match.service
 import com.fightclub.fight_club_server.match.domain.MatchStatus
 import com.fightclub.fight_club_server.match.dto.*
 import com.fightclub.fight_club_server.match.exception.MatchNotFoundException
-import com.fightclub.fight_club_server.match.exception.UserIsNotParticipantException
+import com.fightclub.fight_club_server.match.exception.MatchNotFoundSocketException
+import com.fightclub.fight_club_server.match.exception.UserIsNotParticipantSocketException
 import com.fightclub.fight_club_server.match.mapper.MatchMapper
 import com.fightclub.fight_club_server.match.repository.ChatMessageRepository
 import com.fightclub.fight_club_server.match.repository.MatchRepository
@@ -28,7 +29,7 @@ class MatchService(
         val match = matchRepository.findById(matchId).orElseThrow { MatchNotFoundException() }
 
         if(!match.isParticipant(user)) {
-            throw UserIsNotParticipantException()
+            throw UserIsNotParticipantSocketException()
         }
 
         return matchMapper.toInfoResponse(match, user)
@@ -36,10 +37,10 @@ class MatchService(
 
     @Transactional
     fun updateReadyStatus(user: User, readyRequest: ReadyRequest): MatchReadyResponse {
-        val match = matchRepository.findByIdWithLock(readyRequest.matchId).orElseThrow { throw MatchNotFoundException() }
+        val match = matchRepository.findByIdWithLock(readyRequest.matchId).orElseThrow { throw MatchNotFoundSocketException() }
 
         if (!match.isParticipant(user)) {
-            throw UserIsNotParticipantException()
+            throw UserIsNotParticipantSocketException()
         }
 
         match.updateReadyStatus(user)
@@ -50,14 +51,14 @@ class MatchService(
 
     @Transactional
     fun declineMatch(user: User, declineRequest: DeclineRequest): DeclineMatchResponse {
-        val match = matchRepository.findByIdWithLock(declineRequest.matchId).orElseThrow { throw MatchNotFoundException() }
+        val match = matchRepository.findByIdWithLock(declineRequest.matchId).orElseThrow { throw MatchNotFoundSocketException() }
 
         if (!match.isParticipant(user)) {
-            throw UserIsNotParticipantException()
+            throw UserIsNotParticipantSocketException()
         }
 
         if (match.status == MatchStatus.DECLINED) {
-            throw MatchNotFoundException()
+            throw MatchNotFoundSocketException()
         }
 
         match.declineMatch()

@@ -3,8 +3,8 @@ package com.fightclub.fight_club_server.match.service
 import com.fightclub.fight_club_server.match.domain.ChatMessage
 import com.fightclub.fight_club_server.match.dto.ChatMessageRequest
 import com.fightclub.fight_club_server.match.dto.ChatMessageResponse
-import com.fightclub.fight_club_server.match.exception.MatchNotFoundException
-import com.fightclub.fight_club_server.match.exception.UserIsNotParticipantException
+import com.fightclub.fight_club_server.match.exception.MatchNotFoundSocketException
+import com.fightclub.fight_club_server.match.exception.UserIsNotParticipantSocketException
 import com.fightclub.fight_club_server.match.mapper.ChatMessageMapper
 import com.fightclub.fight_club_server.match.repository.ChatMessageRepository
 import com.fightclub.fight_club_server.match.repository.MatchRepository
@@ -30,10 +30,10 @@ class ChatMessageService(
     }
 
     fun saveChatMessage(user: User, chatMessageRequest: ChatMessageRequest): ChatMessageResponse {
-        val match = matchRepository.findById(chatMessageRequest.matchId).orElseThrow { throw MatchNotFoundException() }
+        val match = matchRepository.findById(chatMessageRequest.matchId).orElseThrow { throw MatchNotFoundSocketException() }
 
         if (!match.isParticipant(user)) {
-            throw UserIsNotParticipantException()
+            throw UserIsNotParticipantSocketException()
         }
 
         val chatMessage = chatMessageRepository.save(

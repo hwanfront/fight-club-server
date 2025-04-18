@@ -56,6 +56,11 @@ object MatchConstants {
         const val MESSAGE = "사용자가 매치 참가자가 아닙니다."
     }
 
+    object UnnecessaryReadUpdate {
+        const val CODE = "MRE001"
+        const val MESSAGE = "이미 모든 메시지를 읽었습니다."
+    }
+
 
     object MatchReadyUpdatedSuccess {
         const val CODE = "MATCH_READY_UPDATED"
