@@ -3,10 +3,7 @@ package com.fightclub.fight_club_server.match.controller
 import com.fightclub.fight_club_server.common.dto.SocketResponse
 import com.fightclub.fight_club_server.common.exception.SocketCodeException
 import com.fightclub.fight_club_server.match.constants.MatchSocketSuccessCode
-import com.fightclub.fight_club_server.match.dto.ChatMessageRequest
-import com.fightclub.fight_club_server.match.dto.DeclineRequest
-import com.fightclub.fight_club_server.match.dto.ReadChatMessageRequest
-import com.fightclub.fight_club_server.match.dto.ReadyRequest
+import com.fightclub.fight_club_server.match.dto.*
 import com.fightclub.fight_club_server.match.service.ChatMessageService
 import com.fightclub.fight_club_server.match.service.MatchReadStatusService
 import com.fightclub.fight_club_server.match.service.MatchService
@@ -97,6 +94,27 @@ class MatchSocketController(
             if (e is SocketCodeException) {
                 messagingTemplate.convertAndSend(
                     "/ws/sub/match/room/${readChatMessageRequest.matchId}",
+                    SocketResponse.error(e.socketResponseCode)
+                )
+            }
+        }
+    }
+
+    @MessageMapping("/match.typing")
+    fun typing(@Payload typingStatusRequest: TypingStatusRequest, principal: Principal) {
+        try {
+            val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundSocketException()
+            messagingTemplate.convertAndSend(
+                "/ws/sub/match/room/${typingStatusRequest.matchId}",
+                SocketResponse.success(MatchSocketSuccessCode.NEW_CHAT_MESSAGE_RECEIVED_SUCCESS, TypingStatusResponse(
+                    userId = user.id!!,
+                    isTyping = typingStatusRequest.isTyping
+                ))
+            )
+        } catch (e: Exception) {
+            if (e is SocketCodeException) {
+                messagingTemplate.convertAndSend(
+                    "/ws/sub/match/room/${typingStatusRequest.matchId}",
                     SocketResponse.error(e.socketResponseCode)
                 )
             }
