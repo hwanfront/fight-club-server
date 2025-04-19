@@ -1,6 +1,6 @@
 # WebSocket API 문서
 
-## ✅ 기본 정보
+## 기본 정보
 - WebSocket 연결 주소: `ws://<host>/ws`
 - SockJS 사용
 - PUB (Client → Server): `/ws/pub`
@@ -63,7 +63,7 @@ Exception:
 {"code": "ME002", "message": "사용자가 매치 참가자가 아닙니다."}
 ```
 
-### 💬 채팅 메시지 전송
+### 채팅 메시지 전송
 ```
 PUB: /ws/pub/match.chat  
 SUB: /ws/sub/match/room/{matchId}  
@@ -101,7 +101,7 @@ Exception:
 {"code": "ME002", "message": "사용자가 매치 참가자가 아닙니다."}
 ```
 
-### ✅ 메시지 읽음 처리
+### 메시지 읽음 처리
 ```
 PUB: /ws/pub/match.read  
 SUB: /ws/sub/match/room/{matchId}  
@@ -127,7 +127,7 @@ Exception:
 {"code": "MRE001", "message": "이미 모든 메시지를 읽었습니다."}
 ```
 
-### ✍️ 타이핑 중 알림
+### 타이핑 중 알림
 ```
 PUB: /ws/pub/match.typing  
 SUB: /ws/sub/match/room/{matchId}  
