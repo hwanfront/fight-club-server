@@ -1,9 +1,7 @@
 package com.fightclub.fight_club_server.match.exception
 
-import com.fightclub.fight_club_server.common.constants.SocketResponseCode
 import com.fightclub.fight_club_server.common.exception.BaseException
 import com.fightclub.fight_club_server.common.exception.SocketBaseException
-import com.fightclub.fight_club_server.common.exception.SocketCodeException
 import com.fightclub.fight_club_server.match.constants.MatchErrorCode
 import com.fightclub.fight_club_server.match.constants.MatchSocketErrorCode
 
@@ -16,6 +14,6 @@ class MatchNotFoundSocketException(
 class UserIsNotParticipantSocketException(
     override val socketResponseCode: MatchSocketErrorCode = MatchSocketErrorCode.USER_IS_NOT_PARTICIPANT
 ): SocketBaseException(MatchSocketErrorCode.USER_IS_NOT_PARTICIPANT)
-class UnnecessaryReadUpdateException(
+class UnnecessaryReadUpdateSocketException(
     override val socketResponseCode: MatchSocketErrorCode = MatchSocketErrorCode.UNNECESSARY_READ_UPDATE
 ): SocketBaseException(MatchSocketErrorCode.UNNECESSARY_READ_UPDATE)
