@@ -46,7 +46,7 @@ class MatchServiceTest {
     }
 
     @Test
-    fun getMatchList() {
+    fun `# getMatchList success`() {
         // given
         val userId = 1L
         val user = User(id = userId, nickname = "user")
@@ -121,7 +121,7 @@ class MatchServiceTest {
     }
 
     @Test
-    fun getMatchInfo() {
+    fun `# getMatchInfo success`() {
         // given
         val userId = 1L
         val matchId = 1L
@@ -159,6 +159,47 @@ class MatchServiceTest {
         assertThat(result).isEqualTo(matchInfo)
     }
 
+    @Test
+    fun `# getMatchInfo failed - MatchNotFoundException`() {
+        // given
+        val userId = 1L
+        val matchId = 1L
+        val user = User(id = userId, nickname = "user")
+
+        given(matchRepository.findById(matchId)).willReturn(Optional.empty())
+
+        // when
+        // then
+        assertThrows(MatchNotFoundException::class.java) {
+            matchService.getMatchInfo(matchId, user)
+        }
+    }
+
+    @Test
+    fun `# getMatchInfo failed - UserIsNotParticipantException`() {
+        // given
+        val userId = 1L
+        val matchId = 1L
+        val user = User(id = userId, nickname = "user")
+        val match = Match(
+            id = matchId,
+            user1 = User(id = 3L, nickname = "opponent2"),
+            user2 = User(id = 2L, nickname = "opponent1"),
+            status = MatchStatus.CHATTING,
+            readyStatus = MatchReadyStatus.USER1_READY,
+            weightClass = WeightClass.BANTAM,
+            user1Weight = 54.0,
+            user2Weight = 55.0,
+        )
+
+        given(matchRepository.findById(matchId)).willReturn(Optional.of(match))
+
+        // when
+        // then
+        assertThrows(UserIsNotParticipantException::class.java) {
+            matchService.getMatchInfo(matchId, user)
+        }
+    }
 
     @Test
     fun `updateReadyStatus success - NONE to USER1_READY`() {
