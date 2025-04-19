@@ -40,7 +40,7 @@ object MatchConstants {
     object GetChatMessageListSuccess {
         const val STATUS_CODE = "200"
         const val CODE = "MS009"
-        const val MESSAGE = "매치 채팅목록 조회를 성공하였습니다."
+        const val MESSAGE = "채팅 메시지 조회를 성공하였습니다."
     }
 
 

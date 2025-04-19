@@ -4,6 +4,7 @@ import com.fightclub.fight_club_server.match.domain.MatchStatus
 import com.fightclub.fight_club_server.match.dto.*
 import com.fightclub.fight_club_server.match.exception.MatchNotFoundException
 import com.fightclub.fight_club_server.match.exception.MatchNotFoundSocketException
+import com.fightclub.fight_club_server.match.exception.UserIsNotParticipantException
 import com.fightclub.fight_club_server.match.exception.UserIsNotParticipantSocketException
 import com.fightclub.fight_club_server.match.mapper.MatchMapper
 import com.fightclub.fight_club_server.match.repository.ChatMessageRepository
@@ -29,7 +30,7 @@ class MatchService(
         val match = matchRepository.findById(matchId).orElseThrow { MatchNotFoundException() }
 
         if(!match.isParticipant(user)) {
-            throw UserIsNotParticipantSocketException()
+            throw UserIsNotParticipantException()
         }
 
         return matchMapper.toInfoResponse(match, user)
