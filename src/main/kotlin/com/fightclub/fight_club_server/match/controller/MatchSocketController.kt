@@ -106,7 +106,7 @@ class MatchSocketController(
             val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundSocketException()
             messagingTemplate.convertAndSend(
                 "/ws/sub/match/room/${typingStatusRequest.matchId}",
-                SocketResponse.success(MatchSocketSuccessCode.NEW_CHAT_MESSAGE_RECEIVED_SUCCESS, TypingStatusResponse(
+                SocketResponse.success(MatchSocketSuccessCode.TYPING_STATUS_RECEIVED_SUCCESS, TypingStatusResponse(
                     userId = user.id!!,
                     isTyping = typingStatusRequest.isTyping
                 ))

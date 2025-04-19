@@ -76,4 +76,9 @@ object MatchConstants {
         const val CODE = "NEW_CHAT_MESSAGE_RECEIVED"
         const val MESSAGE = "채팅 메시지를 수신했습니다."
     }
+
+    object TypingStatusReceivedSuccess {
+        const val CODE = "TYPING_STATUS_RECEIVED"
+        const val MESSAGE = "상대방의 입력 상태를 확인하였습니다."
+    }
 }
