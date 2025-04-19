@@ -14,4 +14,6 @@ enum class MatchSuccessCode(
     PAUSE_MATCH_STREAMING_SUCCESS(HttpStatus.OK, MatchConstants.PauseMatchStreamingSuccess.CODE, MatchConstants.PauseMatchStreamingSuccess.MESSAGE),
     RESUME_MATCH_STREAMING_SUCCESS(HttpStatus.OK, MatchConstants.ResumeMatchStreamingSuccess.CODE, MatchConstants.ResumeMatchStreamingSuccess.MESSAGE),
     END_MATCH_STREAMING_SUCCESS(HttpStatus.OK, MatchConstants.EndMatchStreamingSuccess.CODE, MatchConstants.EndMatchStreamingSuccess.MESSAGE),
+
+    GET_CHAT_MESSAGE_LIST_SUCCESS(HttpStatus.OK, MatchConstants.GetChatMessageListSuccess.CODE, MatchConstants.GetChatMessageListSuccess.MESSAGE),
 }

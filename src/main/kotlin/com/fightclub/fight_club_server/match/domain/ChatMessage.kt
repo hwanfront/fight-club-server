@@ -5,8 +5,8 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "match_message")
-class MatchMessage (
+@Table(name = "chat_message")
+class ChatMessage (
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -18,6 +18,9 @@ class MatchMessage (
     val sender: User,
 
     val content: String,
+
+    @Enumerated(EnumType.STRING)
+    val messageType: ChatMessageType,
 
     val sentAt: LocalDateTime = LocalDateTime.now()
 )

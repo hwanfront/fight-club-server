@@ -37,6 +37,12 @@ object MatchConstants {
         const val MESSAGE = "방송 종류"
     }
 
+    object GetChatMessageListSuccess {
+        const val STATUS_CODE = "200"
+        const val CODE = "MS009"
+        const val MESSAGE = "채팅 메시지 조회를 성공하였습니다."
+    }
+
 
     object MatchNotFound {
         const val STATUS_CODE = "404"
@@ -50,6 +56,11 @@ object MatchConstants {
         const val MESSAGE = "사용자가 매치 참가자가 아닙니다."
     }
 
+    object UnnecessaryReadUpdate {
+        const val CODE = "ME003"
+        const val MESSAGE = "이미 모든 메시지를 읽었습니다."
+    }
+
 
     object MatchReadyUpdatedSuccess {
         const val CODE = "MATCH_READY_UPDATED"
@@ -59,5 +70,20 @@ object MatchConstants {
     object DeclineMatchSuccess {
         const val CODE = "DECLINE_MATCH"
         const val MESSAGE = "매치가 거절되었습니다."
+    }
+
+    object NewChatMessageReceivedSuccess {
+        const val CODE = "NEW_CHAT_MESSAGE_RECEIVED"
+        const val MESSAGE = "채팅 메시지를 수신했습니다."
+    }
+
+    object ReadChatMessageSuccess {
+        const val CODE = "READ_CHAT_MESSAGE"
+        const val MESSAGE = "메시지 읽음 처리를 성공하였습니다."
+    }
+
+    object TypingStatusReceivedSuccess {
+        const val CODE = "TYPING_STATUS_RECEIVED"
+        const val MESSAGE = "상대방의 입력 상태를 확인하였습니다."
     }
 }
