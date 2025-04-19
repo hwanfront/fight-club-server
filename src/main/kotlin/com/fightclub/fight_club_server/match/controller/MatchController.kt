@@ -33,7 +33,7 @@ class MatchController(
         @PathVariable matchId: Long,
         @RequestParam(defaultValue = "30") size: Int,
         @AuthenticationPrincipal user: User,
-    ) = BaseResponse.success(MatchSuccessCode.GET_CHAT_MESSAGE_LIST_SUCCESS, chatMessageService.getLatestMessageList(matchId, user, size))
+    ) = BaseResponse.success(MatchSuccessCode.GET_CHAT_MESSAGE_LIST_SUCCESS, chatMessageService.getLatestMessageList(matchId, size))
 
     @GetMapping("/{matchId}/messages/before/{beforeMessageId}")
     fun getBeforeMessages(
@@ -41,7 +41,7 @@ class MatchController(
         @PathVariable beforeMessageId: Long,
         @RequestParam(defaultValue = "30") size: Int,
         @AuthenticationPrincipal user: User,
-    ) = BaseResponse.success(MatchSuccessCode.GET_CHAT_MESSAGE_LIST_SUCCESS, chatMessageService.getBeforeMessageList(matchId, beforeMessageId, user, size))
+    ) = BaseResponse.success(MatchSuccessCode.GET_CHAT_MESSAGE_LIST_SUCCESS, chatMessageService.getBeforeMessageList(matchId, beforeMessageId, size))
 
     @PostMapping("/{matchId}/start")
     @PreAuthorize("isAuthenticated()")

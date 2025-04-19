@@ -19,12 +19,12 @@ class ChatMessageService(
     private val matchRepository: MatchRepository
 ) {
 
-    fun getLatestMessageList(matchId: Long, user: User, size: Int): List<ChatMessageResponse> {
+    fun getLatestMessageList(matchId: Long, size: Int): List<ChatMessageResponse> {
         val chatMessages = chatMessageRepository.findByMatchIdOrderByIdDesc(matchId, PageRequest.of(0, size))
         return chatMessages.map(chatMessageMapper::toResponse)
     }
 
-    fun getBeforeMessageList(matchId: Long, beforeMessageId: Long, user: User, size: Int): List<ChatMessageResponse> {
+    fun getBeforeMessageList(matchId: Long, beforeMessageId: Long, size: Int): List<ChatMessageResponse> {
         val chatMessages = chatMessageRepository.findByMatchIdAndIdLessThanOrderByIdDesc(matchId, beforeMessageId, PageRequest.of(0, size))
         return chatMessages.map(chatMessageMapper::toResponse)
     }
