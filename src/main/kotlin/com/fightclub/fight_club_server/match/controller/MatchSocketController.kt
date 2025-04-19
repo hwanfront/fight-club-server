@@ -88,7 +88,7 @@ class MatchSocketController(
             val response = matchReadStatusService.updateLastReadMessage(readChatMessageRequest, user)
             messagingTemplate.convertAndSend(
                 "/ws/sub/match/room/${readChatMessageRequest.matchId}",
-                SocketResponse.success(MatchSocketSuccessCode.NEW_CHAT_MESSAGE_RECEIVED_SUCCESS, response)
+                SocketResponse.success(MatchSocketSuccessCode.READ_CHAT_MESSAGE_SUCCESS, response)
             )
         } catch (e: Exception) {
             if (e is SocketCodeException) {
@@ -104,6 +104,7 @@ class MatchSocketController(
     fun typing(@Payload typingStatusRequest: TypingStatusRequest, principal: Principal) {
         try {
             val user = userRepository.findByEmail(principal.name) ?: throw UserNotFoundSocketException()
+            matchService.validateMatchParticipant(typingStatusRequest.matchId, user)
             messagingTemplate.convertAndSend(
                 "/ws/sub/match/room/${typingStatusRequest.matchId}",
                 SocketResponse.success(MatchSocketSuccessCode.TYPING_STATUS_RECEIVED_SUCCESS, TypingStatusResponse(

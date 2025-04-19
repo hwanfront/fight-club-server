@@ -57,7 +57,7 @@ object MatchConstants {
     }
 
     object UnnecessaryReadUpdate {
-        const val CODE = "MRE001"
+        const val CODE = "ME003"
         const val MESSAGE = "이미 모든 메시지를 읽었습니다."
     }
 
@@ -75,6 +75,11 @@ object MatchConstants {
     object NewChatMessageReceivedSuccess {
         const val CODE = "NEW_CHAT_MESSAGE_RECEIVED"
         const val MESSAGE = "채팅 메시지를 수신했습니다."
+    }
+
+    object ReadChatMessageSuccess {
+        const val CODE = "READ_CHAT_MESSAGE"
+        const val MESSAGE = "메시지 읽음 처리를 성공하였습니다."
     }
 
     object TypingStatusReceivedSuccess {

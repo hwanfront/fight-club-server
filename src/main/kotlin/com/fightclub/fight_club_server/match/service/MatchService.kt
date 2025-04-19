@@ -68,6 +68,14 @@ class MatchService(
         return matchMapper.toDeclineMatchResponse(match, user)
     }
 
+    fun validateMatchParticipant(matchId: Long, user: User) {
+        val match = matchRepository.findById(matchId).orElseThrow { MatchNotFoundSocketException() }
+
+        if (!match.isParticipant(user)) {
+            throw UserIsNotParticipantSocketException()
+        }
+    }
+
     fun startMatchStreaming(matchId: Long, user: User): Unit {
 
     }
