@@ -1,3 +1,9 @@
 spring:
   application:
     name: fight-club-server
+
+jwt:
+  secret: secret
+  access-token-validity: 3600000
+  refresh-token-validity: 604800000
+
