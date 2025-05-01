@@ -6,6 +6,7 @@ import com.fightclub.fight_club_server.auth.dto.*
 import com.fightclub.fight_club_server.auth.dto.docs.*
 import com.fightclub.fight_club_server.auth.service.AuthService
 import com.fightclub.fight_club_server.common.dto.BaseResponse
+import com.fightclub.fight_club_server.security.jwt.JwtProperties
 import com.fightclub.fight_club_server.user.constants.UserConstants
 import com.fightclub.fight_club_server.user.domain.User
 import io.swagger.v3.oas.annotations.Operation
@@ -13,6 +14,10 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.http.HttpHeaders
+import org.springframework.http.ResponseCookie
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PostMapping
@@ -23,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Auth", description = "Auth API")
 @RestController
 @RequestMapping("/api/auth")
-class AuthController(private val authService: AuthService) {
+class AuthController(private val authService: AuthService, private val jwtProperties: JwtProperties) {
 
     @Operation(
         summary = "로그인",
@@ -48,8 +53,29 @@ class AuthController(private val authService: AuthService) {
     @PostMapping("/login")
     @PreAuthorize("isAnonymous()")
     fun login(
-        @RequestBody loginRequest: LoginRequest
-    ) = BaseResponse.success(AuthSuccessCode.LOGIN_SUCCESS, authService.login(loginRequest))
+        @RequestBody loginRequest: LoginRequest,
+        response: HttpServletResponse
+    ): ResponseEntity<BaseResponse<LoginResponse>> {
+        val loginResponse = authService.login(loginRequest)
+
+        val accessTokenCookie = ResponseCookie.from("accessToken", loginResponse.accessToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(jwtProperties.accessTokenValidity)
+            .build()
+
+        val refreshTokenCookie = ResponseCookie.from("refreshToken", loginResponse.refreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(jwtProperties.refreshTokenValidity)
+            .build()
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+        return BaseResponse.success(AuthSuccessCode.LOGIN_SUCCESS, null)
+    }
 
     @Operation(
         summary = "로그아웃",
