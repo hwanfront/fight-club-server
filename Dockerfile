@@ -1,7 +1,4 @@
-FROM eclipse-temurin:17-jdk
-
-USER root
-RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
+FROM eclipse-temurin:17-jdk\
 
 WORKDIR /app
 ARG PROFILE
