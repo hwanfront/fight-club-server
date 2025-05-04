@@ -3,4 +3,4 @@ WORKDIR /app
 ARG PROFILE
 ENV SPRING_PROFILES_ACTIVE=$PROFILE
 COPY build/libs/fight-club-server-0.0.1-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=dev"]
