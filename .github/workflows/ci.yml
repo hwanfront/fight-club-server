@@ -1,0 +1,68 @@
+name: CI for Dev Branch
+
+on:
+  push:
+    branches: [ "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        
+    - name: Cache Gradle
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          gradle-${{ runner.os }}-
+
+    - name: Grant permission for gradlew
+      run: chmod +x ./gradlew
+      
+    - name: Clean and Build (without tests)
+      run: ./gradlew clean build -x test
+
+    - name: Run Tests
+      run: ./gradlew test --continue    
+    
+    - name: Ensure test reports directory exists (on failure)
+      if: failure()
+      run: |
+        mkdir -p build/reports/tests/test
+        echo "❌ 테스트가 실패하여 HTML 리포트가 생성되지 않았습니다." > build/reports/tests/test/README.txt
+      
+    - name: Upload test report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report
+        path: build/reports/tests/test
+
+    - name: Notify Discord
+      if: always()
+      run: |
+        STATUS="${{ job.status }}"
+        if [ "$STATUS" = "success" ]; then
+          MESSAGE="✅ 테스트 성공: [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }}) @ ${{ github.ref_name }} - 커밋: ${{ github.sha }}"
+        else
+          MESSAGE="🚨 테스트 실패: [${{ github.repository }}](${{ github.server_url }}/${{ github.repository }}) @ ${{ github.ref_name }} - 커밋: ${{ github.sha }}"
+        fi
+
+        curl -H "Content-Type: application/json" \
+          -X POST \
+          -d "{\"content\": \"$MESSAGE\"}" \
+          ${{ secrets.DISCORD_WEBHOOK_URL }}
