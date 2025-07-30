@@ -17,11 +17,37 @@ class JwtAuthenticationFilter(
     private val tokenProvider: TokenProvider,
     private val userRepository: UserRepository
 ) : OncePerRequestFilter() {
+
+    private val PUBLIC_URL_PATTERNS = listOf(
+        "/api/auth/login",
+        "/api/auth/refresh",
+        "/api/users/signup",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/ws/**",
+        "/oauth2/authorization/**",
+        "/login/oauth2/code/**"
+    )
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+        val requestUri = request.requestURI
+        val isPublicUrl = PUBLIC_URL_PATTERNS.any { pattern ->
+            requestUri.startsWith(pattern.substringBeforeLast("/**")) // 간략화된 매칭
+            // 또는 정확히 일치하는지 확인
+            // requestUri == pattern || (pattern.endsWith("/**") && requestUri.startsWith(pattern.substringBeforeLast("/**")))
+        }
+
+
+        if (isPublicUrl) {
+            filterChain.doFilter(request, response)
+            return
+        }
+
+
         try {
             val token = resolveToken(request)
             if (!token.isNullOrBlank() && tokenProvider.validateToken(token)) {
@@ -39,13 +65,18 @@ class JwtAuthenticationFilter(
             }
 
         } catch (e: Exception) {
-            println(e.message)
+            System.err.println("JWT Authentication Filter Error: ${e.message}")
+            e.printStackTrace() // 🚨 이 라인을 추가하여 상세 스택 트레이스 확인
         }
         filterChain.doFilter(request, response)
     }
 
     private fun resolveToken(request: HttpServletRequest): String? {
-        val bearer = request.getHeader("Authorization") ?: return null
-        return if (bearer.startsWith("Bearer ")) bearer.substring(7) else null
+        val bearerToken = request.getHeader("Authorization")
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7)
+        }
+
+        return request.cookies?.firstOrNull { it.name == "accessToken" }?.value
     }
 }

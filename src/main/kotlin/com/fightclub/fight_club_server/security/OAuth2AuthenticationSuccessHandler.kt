@@ -54,9 +54,9 @@ class OAuth2AuthenticationSuccessHandler(
         } else {
             refreshTokenRepository.save(
                 RefreshToken(
-                userId = userId,
-                tokenValue = refreshToken
-            )
+                    userId = userId,
+                    tokenValue = refreshToken
+                )
             )
         }
         response.sendRedirect("$redirectUri?accessToken=$accessToken&refreshToken=$refreshToken")
