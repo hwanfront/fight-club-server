@@ -27,6 +27,8 @@ class SecurityConfig(
             .cors { it.configurationSource(corsConfig.corsConfigurationSource()) }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .httpBasic { it.disable() }
+            .formLogin { it.disable() }
             .authorizeHttpRequests {
                 it
                     .requestMatchers(
@@ -37,6 +39,7 @@ class SecurityConfig(
                         "/ws/sub/**",
 
                         "/api/auth/**",
+                        "/api/auth/login",
                         "/api/auth/refresh",
                         "/api/users/signup",
 

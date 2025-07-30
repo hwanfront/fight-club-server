@@ -1,6 +1,10 @@
 spring:
   application:
     name: fight-club-server
+  config:
+    activate:
+      on-profile: prod
+
 
 jwt:
   secret: secret
