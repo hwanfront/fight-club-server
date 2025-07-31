@@ -60,14 +60,14 @@ class AuthController(private val authService: AuthService, private val jwtProper
 
         val accessTokenCookie = ResponseCookie.from("accessToken", loginResponse.accessToken)
             .httpOnly(true)
-            .secure(false) // only dev
+            .secure(true)
             .path("/")
             .maxAge(jwtProperties.accessTokenValidity)
             .build()
 
         val refreshTokenCookie = ResponseCookie.from("refreshToken", loginResponse.refreshToken)
             .httpOnly(true)
-            .secure(false) // only dev
+            .secure(true)
             .path("/")
             .maxAge(jwtProperties.refreshTokenValidity)
             .build()
