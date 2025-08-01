@@ -2,6 +2,7 @@ package com.fightclub.fight_club_server.user.dto
 
 import com.fightclub.fight_club_server.user.domain.AuthProvider
 import com.fightclub.fight_club_server.user.domain.UserRole
+import com.fightclub.fight_club_server.user.domain.UserStatus
 
 data class UserInfoResponse (
     var email: String,
@@ -9,5 +10,6 @@ data class UserInfoResponse (
     val nickname: String,
     val providerId: String?,
     var provider: AuthProvider,
-    var role: UserRole
+    var role: UserRole,
+    var status: UserStatus
 )

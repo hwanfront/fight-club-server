@@ -14,7 +14,8 @@ class UserMapper {
         nickname = user.nickname ?: "unknown",
         providerId = user.providerId ?: "N/A",
         provider = user.provider,
-        role = user.role
+        role = user.role,
+        status = user.status,
     )
 
     fun fromSignupRequest(signupRequest: SignupRequest, encodedPassword: String) = User(
