@@ -19,7 +19,7 @@ class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val customOAuth2UserService: CustomOAuth2UserService,
     private val corsConfig: CorsConfig,
-    private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler
+    private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -50,9 +50,10 @@ class SecurityConfig(
                         "/socket-test.html").permitAll()
                     .anyRequest().authenticated()
             }
-            .oauth2Login {
-                it.userInfoEndpoint { it.userService(customOAuth2UserService) }
-                it.successHandler(oAuth2AuthenticationSuccessHandler)
+            .oauth2Login { oauth2Login ->
+                oauth2Login
+                    .userInfoEndpoint { it.userService(customOAuth2UserService) }
+                    .successHandler(oAuth2AuthenticationSuccessHandler)
             }
             .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter::class.java)
 

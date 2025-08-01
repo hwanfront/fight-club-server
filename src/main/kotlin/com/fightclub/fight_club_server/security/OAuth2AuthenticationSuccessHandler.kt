@@ -32,8 +32,16 @@ class OAuth2AuthenticationSuccessHandler(
         authentication: Authentication
     ) {
         val oAuth2User = authentication.principal as? OAuth2User
-            ?: return response.sendRedirect("/error")
+            ?: return response.sendRedirect("$redirectUri?error=invalid_user")
         val registrationId = (authentication as? OAuth2AuthenticationToken)?.authorizedClientRegistrationId ?: "none"
+
+        val emailAlreadyExists = oAuth2User.attributes["emailAlreadyExists"] as? Boolean ?: false
+        val existingUserId = oAuth2User.attributes["existingUserId"] as? Long
+
+        if (emailAlreadyExists && existingUserId != null) {
+            val email = oAuth2User.attributes["email"] as? String
+            return response.sendRedirect("$redirectUri?error=email_already_exists&email=$email&userId=$existingUserId")
+        }
 
         val strategy = OAuth2UserInfoFactory.getStrategy(registrationId)
         val provider = strategy.provider
@@ -41,7 +49,16 @@ class OAuth2AuthenticationSuccessHandler(
 
         val user = userRepository.findByProviderAndProviderId(provider, providerId)
             ?.takeIf { it.status != UserStatus.DELETED }
-            ?: return response.sendRedirect("/error")
+            ?: run {
+                val email = oAuth2User.attributes["email"] as? String
+                if (email != null) {
+                    userRepository.findByEmail(email)
+                } else {
+                    null
+                }
+            }
+            ?: return response.sendRedirect("$redirectUri?error=user_not_found")
+
         val userId = user.id!!
         val accessToken = tokenProvider.generateAccessToken(userId)
         val refreshToken = tokenProvider.generateRefreshToken(userId)
