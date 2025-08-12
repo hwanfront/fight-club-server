@@ -59,6 +59,7 @@ class UserServiceTest {
             providerId = null,
             provider = AuthProvider.NONE,
             status = UserStatus.REGISTERED,
+            profileImageUrl = "http://testurl.com"
         )
         val response = UserInfoResponse(
             email = email,
@@ -66,7 +67,9 @@ class UserServiceTest {
             nickname = "nickname",
             providerId = null,
             provider = AuthProvider.NONE,
-            role = UserRole.ROLE_USER
+            role = UserRole.ROLE_USER,
+            status = UserStatus.REGISTERED,
+            profileImageUrl = "http://testurl.com",
         )
 
         given(userRepository.findById(userId)).willReturn(Optional.of(user))
