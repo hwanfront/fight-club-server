@@ -33,6 +33,8 @@ class User(
     @Enumerated(EnumType.STRING)
     val provider: AuthProvider = AuthProvider.NONE,
 
+    val profileImageUrl: String? = null,
+
     @Enumerated(EnumType.STRING)
     var status: UserStatus = UserStatus.WAITING,
 
