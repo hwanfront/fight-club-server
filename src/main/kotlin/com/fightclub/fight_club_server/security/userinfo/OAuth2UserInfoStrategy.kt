@@ -6,4 +6,5 @@ interface OAuth2UserInfoStrategy {
     val provider: AuthProvider
     fun extractProviderId(attributes: Map<String, Any>): String
     fun extractEmail(attributes: Map<String, Any>): String
+    fun extractProfileUrl(attributes: Map<String, Any>): String
 }

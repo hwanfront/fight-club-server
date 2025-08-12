@@ -1,7 +1,7 @@
 package com.fightclub.fight_club_server.security
 
+import com.fightclub.fight_club_server.common.service.ImageService
 import com.fightclub.fight_club_server.security.userinfo.OAuth2UserInfoFactory
-import com.fightclub.fight_club_server.user.domain.AuthProvider
 import com.fightclub.fight_club_server.user.domain.User
 import com.fightclub.fight_club_server.user.domain.UserStatus
 import com.fightclub.fight_club_server.user.repository.UserRepository
@@ -14,7 +14,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class CustomOAuth2UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val imageService: ImageService
 ): OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
         val delegate = DefaultOAuth2UserService()
@@ -37,7 +38,6 @@ class CustomOAuth2UserService(
             oAuth2UserAttributes["emailAlreadyExists"] = true
             oAuth2UserAttributes["existingUserId"] = existingUserByEmail.id
 
-            // DefaultOAuth2User의 생성자를 사용하여 새로운 OAuth2User 객체 생성
             return DefaultOAuth2User(
                 oAuth2User.authorities,
                 oAuth2UserAttributes,
@@ -45,19 +45,35 @@ class CustomOAuth2UserService(
                     "google" -> "sub"
                     "kakao" -> "id"
                     "naver" -> "response.id"
-                    // 다른 제공자가 있다면 여기에 추가
-                    else -> "email" // 기본값 설정
-                } // nameAttributeKey, 필요에 따라 수정
+                    else -> "email"
+                }
             )
+        }
+
+        val profileUrl = strategy.extractProfileUrl(oAuth2User.attributes)
+
+        // 이미지 다운로드 및 파일 서버에 저장
+        val savedImageUrl = profileUrl.let { url ->
+            imageService.downloadAndSave(url, getFilenameWithExtension(url,"${provider.name}_${providerId}"))
         }
 
         userRepository.save(User(
             email = email,
             providerId = providerId,
             provider = provider,
+            profileImageUrl = savedImageUrl,
             status = UserStatus.WAITING
         ))
 
         return oAuth2User
+    }
+
+    private fun getFilenameWithExtension(url: String, nickname: String): String {
+        val extension = url.substringAfterLast('.', "")
+        return if (extension.isNotEmpty()) {
+            "$nickname.$extension"
+        } else {
+            "$nickname.jpg"
+        }
     }
 }

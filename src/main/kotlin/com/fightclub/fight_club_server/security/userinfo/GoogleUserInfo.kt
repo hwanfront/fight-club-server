@@ -6,4 +6,5 @@ class GoogleUserInfo : OAuth2UserInfoStrategy {
     override val provider = AuthProvider.GOOGLE
     override fun extractProviderId(attributes: Map<String, Any>) = attributes["sub"].toString()
     override fun extractEmail(attributes: Map<String, Any>) = attributes["email"].toString()
+    override fun extractProfileUrl(attributes: Map<String, Any>) = attributes["picture"].toString()
 }

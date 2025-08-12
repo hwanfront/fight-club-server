@@ -16,6 +16,7 @@ class UserMapper {
         provider = user.provider,
         role = user.role,
         status = user.status,
+        profileImageUrl = user.profileImageUrl
     )
 
     fun fromSignupRequest(signupRequest: SignupRequest, encodedPassword: String) = User(
