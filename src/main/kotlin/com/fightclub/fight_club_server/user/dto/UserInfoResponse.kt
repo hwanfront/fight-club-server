@@ -11,5 +11,6 @@ data class UserInfoResponse (
     val providerId: String?,
     var provider: AuthProvider,
     var role: UserRole,
-    var status: UserStatus
+    var status: UserStatus,
+    var profileImageUrl: String?,
 )
